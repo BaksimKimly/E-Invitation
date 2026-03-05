@@ -1,0 +1,974 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Baksim & Kimly • Invitation</title>
+
+  <!-- Elegant wedding fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#060606;
+      --fg:#f3f3f3;
+      --muted:rgba(255,255,255,.78);
+      --card:rgba(0,0,0,.45);
+      --border:rgba(255,255,255,.16);
+      --shadow:0 14px 50px rgba(0,0,0,.58);
+      --radius:18px;
+
+      --gold1:#d4af37;
+      --gold2:#fff1b0;
+      --gold3:#cfa34f;
+    }
+
+    *{box-sizing:border-box}
+    html,body{
+      height:100%;
+      margin:0;
+      font-family:"Cormorant Garamond", serif;
+      background:var(--bg);
+      color:var(--fg);
+      overflow-x:hidden;
+    }
+    a{color:inherit;text-decoration:none}
+    button{font:inherit}
+
+    /* ===== MAIN (hero) VIDEO BACKGROUND (ALWAYS PRESENT) ===== */
+    .bg-wrap{
+      position:fixed;
+      inset:0;
+      z-index:0;
+      overflow:hidden;
+      background:#050505;
+    }
+    .bg-video{
+      position:absolute; inset:0; width:100%; height:100%;
+      object-fit:cover;
+      z-index:1;
+      filter: brightness(.92) contrast(1.08) saturate(1.12);
+      transform: scale(1.02);
+      opacity:1;
+      transition: opacity .7s ease;
+    }
+
+    .fallback-bg{
+      position:absolute; inset:0; z-index:0;
+      background:
+        radial-gradient(900px 650px at 50% 26%, rgba(255,221,160,.20), transparent 60%),
+        radial-gradient(800px 520px at 12% 86%, rgba(255,190,90,.12), transparent 58%),
+        radial-gradient(900px 650px at 86% 88%, rgba(255,225,170,.12), transparent 58%),
+        linear-gradient(180deg, #0b0b0b, #040404);
+    }
+
+    .overlay{
+      position:absolute; inset:0; z-index:2;
+      background:
+        radial-gradient(55% 45% at 50% 28%, rgba(255,220,150,.22), transparent 60%),
+        radial-gradient(90% 80% at 50% 35%, rgba(0,0,0,.10), rgba(0,0,0,.72));
+    }
+
+    /* bokeh layer for main background */
+    .bokeh-layer{
+      position:absolute;
+      inset:0;
+      z-index:2;
+      pointer-events:none;
+      overflow:hidden;
+    }
+    .bokeh{
+      position:absolute;
+      width:10px;height:10px;border-radius:999px;
+      background: radial-gradient(circle, rgba(255,235,190,.9), rgba(255,215,140,.35) 45%, transparent 70%);
+      filter: blur(2px);
+      opacity:.0;
+      animation: floatUp linear infinite;
+      mix-blend-mode: screen;
+    }
+    @keyframes floatUp{
+      0%{ transform: translateY(30px) scale(.85); opacity:0; }
+      10%{ opacity:.6; }
+      80%{ opacity:.55; }
+      100%{ transform: translateY(-120vh) scale(1.25); opacity:0; }
+    }
+
+    /* Make content above backgrounds */
+    #openingScreen, .hero, .section, .dock, .lightbox{
+      position:relative;
+      z-index:3;
+    }
+
+    /* ===== OPENING SCREEN — PHONE FIT (safe areas) ===== */
+    #openingScreen{
+      position:fixed;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:9999;
+      opacity:1;
+      transition: opacity .7s ease;
+      overflow:hidden;
+      background: transparent;
+
+      min-height: 100svh;
+      padding:
+        max(16px, env(safe-area-inset-top))
+        max(16px, env(safe-area-inset-right))
+        max(18px, env(safe-area-inset-bottom))
+        max(16px, env(safe-area-inset-left));
+    }
+    .opening-glass{
+      position:absolute;
+      inset:0;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      background: rgba(0,0,0,.35);
+    }
+    .opening-overlay{
+      position:absolute; inset:0;
+      background:
+        radial-gradient(70% 60% at 50% 30%, rgba(255,220,150,.10), rgba(0,0,0,.65));
+      pointer-events:none;
+    }
+
+    .open-box{
+      text-align:center;
+      color:white;
+      width: min(720px, 92vw);
+      z-index:2;
+      animation: openPop .9s ease both;
+
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap: 12px;
+
+      /* phone fit: never overflow */
+      max-height: 92svh;
+    }
+
+    .open-sub{
+      font-family:"Cormorant Garamond", serif;
+      letter-spacing:.34em;
+      font-size: 13px;
+      color:rgba(255,255,255,0.75);
+      margin: 0;
+      text-transform: uppercase;
+    }
+
+    /* --- Opening logo (glow + phone fit) --- */
+    .open-logo{
+      width: min(560px, 92vw);
+      height: auto;
+      display:block;
+
+      /* IMPORTANT: fit on phones */
+      max-height: 52svh;
+      object-fit: contain;
+
+      margin: 0 auto;
+      animation: logoFloat 3.8s ease-in-out infinite, logoGlow 2.8s ease-in-out infinite;
+      user-select:none;
+      -webkit-user-drag:none;
+      filter:
+        drop-shadow(0 18px 40px rgba(0,0,0,.55))
+        drop-shadow(0 0 18px rgba(212,175,55,.20))
+        drop-shadow(0 0 34px rgba(255,241,176,.10));
+    }
+
+    /* ===== OPEN BUTTON (match reference) ===== */
+    .open-btn--lux{
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+
+      /* compact capsule */
+      padding: 14px 34px;
+      min-width: 240px;
+
+      border-radius: 18px;
+      border: 1px solid rgba(255,235,190,.55);
+
+      /* dark luxury fill */
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03)),
+        linear-gradient(180deg, rgba(30,26,18,.55), rgba(10,10,10,.55));
+
+      box-shadow:
+        0 18px 50px rgba(0,0,0,.55),
+        inset 0 0 0 1px rgba(0,0,0,.35);
+
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+
+      cursor: pointer;
+      user-select: none;
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, filter .18s ease;
+      overflow: visible;
+    }
+
+    /* inner double border */
+    .open-btn--lux::before{
+      content:"";
+      position:absolute;
+      inset: 5px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,235,190,.22);
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.25);
+      pointer-events:none;
+    }
+
+    /* top diamond */
+    .open-btn__top{
+      position:absolute;
+      top:-11px;
+      left:50%;
+      transform: translateX(-50%) rotate(45deg);
+      width: 18px;
+      height: 18px;
+
+      background: radial-gradient(circle at 30% 30%, rgba(255,241,176,.95), rgba(212,175,55,.55));
+      border: 1px solid rgba(255,235,190,.45);
+      box-shadow: 0 8px 18px rgba(0,0,0,.55), 0 0 18px rgba(212,175,55,.10);
+      border-radius: 4px;
+      pointer-events:none;
+    }
+
+    /* text */
+    .open-btn__label{
+      font-family:"Cormorant Garamond", serif;
+      font-size: 18px;
+      letter-spacing: .46em;
+      font-weight: 600;
+      color: rgba(255,255,255,.92);
+      text-shadow: 0 1px 0 rgba(0,0,0,.35);
+    }
+
+    /* side ornaments */
+    .open-btn__orn{
+      font-size: 18px;
+      color: rgba(212,175,55,.95);
+      text-shadow: 0 0 14px rgba(212,175,55,.14);
+      opacity: .95;
+      transform: translateY(-1px);
+    }
+
+    .open-btn--lux:hover{
+      transform: translateY(-2px);
+      border-color: rgba(255,241,176,.75);
+      box-shadow:
+        0 24px 70px rgba(0,0,0,.65),
+        0 0 34px rgba(212,175,55,.14),
+        inset 0 0 0 1px rgba(0,0,0,.35);
+      filter: brightness(1.03);
+    }
+    .open-btn--lux:active{
+      transform: translateY(0) scale(.99);
+    }
+
+    .open-hint{
+      margin: 4px 0 0;
+      font-family:"Cormorant Garamond", serif;
+      font-size: 12px;
+      letter-spacing: .32em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.62);
+    }
+
+    /* Keyframes */
+    @keyframes openPop{
+      from{ opacity:0; transform: translateY(16px) scale(.985); }
+      to{ opacity:1; transform: translateY(0) scale(1); }
+    }
+    @keyframes logoFloat{
+      0%,100%{ transform: translateY(0); }
+      50%{ transform: translateY(-6px); }
+    }
+    @keyframes logoGlow{
+      0%,100%{
+        filter:
+          drop-shadow(0 18px 40px rgba(0,0,0,.55))
+          drop-shadow(0 0 14px rgba(212,175,55,.18))
+          drop-shadow(0 0 28px rgba(255,241,176,.10));
+      }
+      50%{
+        filter:
+          drop-shadow(0 18px 40px rgba(0,0,0,.55))
+          drop-shadow(0 0 22px rgba(212,175,55,.28))
+          drop-shadow(0 0 44px rgba(255,241,176,.16));
+      }
+    }
+
+    /* phone tune */
+    @media (max-width: 420px){
+      .open-logo{ max-height: 48svh; }
+      .open-btn--lux{
+        min-width: 210px;
+        padding: 12px 26px;
+        border-radius: 16px;
+      }
+      .open-btn--lux::before{ border-radius: 12px; }
+      .open-btn__label{ font-size: 16px; letter-spacing: .40em; }
+    }
+
+    /* ===== Sections ===== */
+    .hero,.section{
+      min-height: 100svh;
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:
+        max(18px, env(safe-area-inset-top))
+        max(18px, env(safe-area-inset-right))
+        max(18px, env(safe-area-inset-bottom))
+        max(18px, env(safe-area-inset-left));
+    }
+
+    .content{
+      width:min(1020px, 94vw);
+      text-align:center;
+      padding: 26px 22px;
+      border-radius: var(--radius);
+      background: var(--card);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+    .hero .content{
+      background: rgba(0,0,0,.34);
+      border-color: rgba(255,255,255,.18);
+    }
+
+    .kicker{
+      letter-spacing:.28em;
+      text-transform:uppercase;
+      font-size: 12px;
+      color: var(--muted);
+      margin: 0 0 10px;
+    }
+
+    .gold-title{
+      font-family: "Great Vibes", cursive;
+      font-weight: 400;
+      letter-spacing: .02em;
+      font-size: clamp(48px, 8vw, 96px);
+      line-height: 1.05;
+      margin: 6px 0 10px;
+
+      background: linear-gradient(90deg,
+        #6b4a1e 0%,
+        #f6e27a 18%,
+        #cfa34f 35%,
+        #fff1b0 50%,
+        #cfa34f 65%,
+        #f6e27a 82%,
+        #6b4a1e 100%
+      );
+      background-size: 240% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: goldShift 4.5s ease-in-out infinite;
+      text-shadow: 0 0 20px rgba(255,220,150,.18);
+    }
+    @keyframes goldShift{
+      0%{ background-position: 0% 50%; }
+      50%{ background-position: 100% 50%; }
+      100%{ background-position: 0% 50%; }
+    }
+
+    .sub{
+      margin: 0 0 18px;
+      font-size: clamp(16px, 2.4vw, 20px);
+      color: rgba(255,255,255,.82);
+      letter-spacing: .02em;
+    }
+
+    .divider{
+      height:1px; background: rgba(255,255,255,.14);
+      margin: 18px auto;
+      width: min(560px, 92%);
+    }
+
+    .meta{
+      margin: 10px 0 0;
+      color: rgba(255,255,255,.78);
+      font-size: 18px;
+      line-height: 1.6;
+    }
+
+    .pillrow{
+      display:flex; flex-wrap:wrap; gap:10px;
+      justify-content:center;
+      margin-top: 16px;
+    }
+    .pill{
+      display:inline-flex; align-items:center; gap:10px;
+      padding: 11px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,215,150,.26);
+      background: rgba(255,255,255,.09);
+      cursor:pointer;
+      user-select:none;
+      transition: transform .16s ease, background .16s ease;
+      font-size: 16px;
+    }
+    .pill:hover{
+      background: rgba(212,175,55,.18);
+      transform: translateY(-1px);
+    }
+
+    .btn{
+      display:inline-block;
+      margin-top: 14px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,215,150,.24);
+      background: rgba(255,255,255,.10);
+      cursor:pointer;
+      transition: background .16s ease, transform .16s ease;
+      font-size: 18px;
+    }
+    .btn:hover{
+      background: rgba(212,175,55,.18);
+      transform: translateY(-1px);
+    }
+
+    .section-title{
+      font-size: clamp(22px, 3.2vw, 32px);
+      margin: 0 0 8px;
+      font-weight: 600;
+      letter-spacing:.02em;
+    }
+
+    .countdown{
+      display:flex; gap:10px; justify-content:center; flex-wrap:wrap;
+      margin-top: 14px;
+    }
+    .cd{
+      min-width: 120px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,215,150,.22);
+      background: rgba(255,255,255,.08);
+    }
+    .cd b{
+      display:block;
+      font-size: 26px;
+      margin-bottom: 2px;
+      color: #fff;
+      text-shadow: 0 0 14px rgba(255,220,150,.16);
+      font-weight: 600;
+    }
+    .cd span{
+      color: rgba(255,255,255,.70);
+      font-size: 12px;
+      letter-spacing:.14em;
+      text-transform: uppercase;
+    }
+
+    .grid{
+      margin-top: 16px;
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    @media (max-width: 760px){
+      .grid{ grid-template-columns: repeat(2, 1fr); }
+      .cd{ min-width: 92px; }
+    }
+
+    .thumb{
+      border:0; padding:0;
+      border-radius: 14px;
+      overflow:hidden;
+      cursor:pointer;
+      background: transparent;
+      position: relative;
+      transform: translateY(10px);
+      opacity: 0;
+      transition: transform .45s ease, opacity .45s ease;
+    }
+    .thumb.show{ transform: translateY(0); opacity: 1; }
+    .thumb img{
+      width:100%;
+      height: clamp(140px, 26vw, 220px);
+      object-fit: cover;
+      display:block;
+      transform: scale(1.03);
+      transition: transform .25s ease;
+    }
+    .thumb:hover img{ transform: scale(1.08); }
+
+    .lightbox{
+      position:fixed; inset:0;
+      background: rgba(0,0,0,.92);
+      display:flex; align-items:center; justify-content:center;
+      z-index: 10000;
+    }
+    .lightbox[hidden]{ display:none; }
+    .lightbox img{
+      width: min(1100px, 92vw);
+      height: auto;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+    }
+    .lb-close{
+      position:absolute; top: 18px; right: 18px;
+      width: 44px; height: 44px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,215,150,.24);
+      background: rgba(255,255,255,.08);
+      color: white;
+      font-size: 26px;
+      cursor:pointer;
+    }
+
+    .dock{
+      position:fixed; left:50%; bottom: 14px;
+      transform: translateX(-50%);
+      display:flex; gap: 10px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.58);
+      border: 1px solid rgba(255,215,150,.20);
+      backdrop-filter: blur(10px);
+      z-index: 9000;
+      letter-spacing:.02em;
+    }
+    .dock a{
+      padding: 8px 10px; border-radius: 999px;
+      color: rgba(255,255,255,.88);
+      font-size: 16px;
+    }
+    .dock a:hover{ background: rgba(212,175,55,.18); }
+
+    .note{
+      margin-top: 12px;
+      font-size: 14px;
+      color: rgba(255,255,255,.68);
+    }
+
+    .qrwrap{
+      display:flex; gap:16px; justify-content:center; align-items:center; flex-wrap:wrap;
+      margin-top: 14px;
+    }
+    .qrbox{
+      width: 190px; height: 190px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,215,150,.22);
+      background: rgba(255,255,255,.06);
+      display:flex; align-items:center; justify-content:center;
+      overflow:hidden;
+    }
+    .qrbox img{ width:100%; height:100%; object-fit:cover; }
+    .qrtext{
+      max-width: 420px;
+      text-align:left;
+      color: rgba(255,255,255,.78);
+      line-height: 1.6;
+      font-size: 16px;
+    }
+    .qrtext strong{ color: #fff; }
+
+    @media (prefers-reduced-motion: reduce){
+      *{ animation:none !important; transition:none !important; scroll-behavior:auto !important; }
+      .bg-video{ transform:none; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- MAIN BACKGROUND (hero.mp4) -->
+  <div class="bg-wrap" aria-hidden="true">
+    <div class="fallback-bg"></div>
+    <video class="bg-video" id="heroVideo" autoplay muted loop playsinline webkit-playsinline preload="auto">
+      <source src="hero.mp4" type="video/mp4" />
+    </video>
+    <div class="bokeh-layer" id="bokehLayer"></div>
+    <div class="overlay"></div>
+  </div>
+
+  <!-- OPENING SCREEN (PHONE-FIT + SAFE AREAS) -->
+  <div id="openingScreen">
+    <div class="opening-glass"></div>
+    <div class="opening-overlay"></div>
+
+    <div class="open-box">
+      <p class="open-sub">Wedding Invitation</p>
+
+      <!-- Put your logo file in the folder and name it "logo.png" -->
+      <img class="open-logo" src="logo.png" alt="Baksim &amp; Kimly Logo" />
+
+      <button id="openBtn" type="button" class="open-btn--lux">
+        <span class="open-btn__top" aria-hidden="true"></span>
+        <span class="open-btn__orn open-btn__orn--l" aria-hidden="true">❦</span>
+        <span class="open-btn__label">OPEN</span>
+        <span class="open-btn__orn open-btn__orn--r" aria-hidden="true">❦</span>
+      </button>
+
+      <p class="open-hint">Tap to enter</p>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <header class="hero" id="top">
+    <div class="content">
+      <p class="kicker">Wedding Invitation</p>
+      <h1 class="gold-title">Baksim &amp; Kimly</h1>
+      <p class="sub">Please Join us for our Special Day</p>
+
+      <div class="divider"></div>
+
+      <p class="meta">
+        <strong>Date:</strong> 29 March 2026<br/>
+        <strong>Time:</strong> 5:00 PM<br/>
+        <strong>Location:</strong> The Premier Center Sensok (Building D&amp;E)
+      </p>
+
+      <div class="countdown" aria-label="Countdown">
+        <div class="cd"><b id="dDays">—</b><span>Days</span></div>
+        <div class="cd"><b id="dHours">—</b><span>Hours</span></div>
+        <div class="cd"><b id="dMins">—</b><span>Minutes</span></div>
+        <div class="cd"><b id="dSecs">—</b><span>Seconds</span></div>
+      </div>
+
+      <div class="pillrow">
+        <a class="pill" href="#event">📅 <span>Event</span></a>
+        <a class="pill" href="#location">📍 <span>Location</span></a>
+        <a class="pill" href="#gallery">🖼️ <span>Gallery</span></a>
+        <button class="pill" id="btnCalendar" type="button">✅ <span>Save the date</span></button>
+      </div>
+    </div>
+  </header>
+
+  <!-- EVENT -->
+  <section class="section" id="event">
+    <div class="content">
+      <h2 class="section-title">Event Details</h2>
+      <p class="meta">
+        <strong>Baksim &amp; Kimly</strong><br/>
+        Sunday, 29 March 2026 • 5:00 PM<br/>
+        The Premier Center Sensok (Building D&amp;E), Phnom Penh
+      </p>
+      <div class="divider"></div>
+      <a class="btn" href="#location">View Location</a>
+    </div>
+  </section>
+
+  <!-- LOCATION + QR -->
+  <section class="section" id="location">
+    <div class="content">
+      <h2 class="section-title">Location</h2>
+      <p class="meta">
+        <strong>The Premier Center Sensok (Building D&amp;E)</strong><br/>
+        Phnom Penh, Cambodia
+      </p>
+
+      <div class="pillrow">
+        <button class="btn" id="btnMaps" type="button">Open in Google Maps</button>
+        <button class="btn" id="btnCopyMap" type="button">Copy Map Link</button>
+        <button class="btn" id="btnGenQR" type="button">Generate QR (online)</button>
+      </div>
+
+      <div class="qrwrap">
+        <div class="qrbox">
+          <img id="qrImg" src="qr.png" alt="QR code" onerror="this.style.display='none';" />
+          <div id="qrFallback" style="display:none;color:rgba(255,255,255,.7);padding:14px;text-align:center;">
+            QR not found.<br/>Add <b>qr.png</b><br/>or generate online.
+          </div>
+        </div>
+
+        <div class="qrtext">
+          <strong>Please scan QR Code for Map</strong><br/>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section class="section" id="gallery">
+    <div class="content">
+      <h2 class="section-title">Gallery</h2>
+      <p class="meta">Tap any photo to view full screen.</p>
+
+      <div class="grid" id="galleryGrid">
+        <button class="thumb" data-full="01.jpg"><img src="01.jpg" alt="Photo 1" loading="lazy"></button>
+        <button class="thumb" data-full="02.jpg"><img src="02.jpg" alt="Photo 2" loading="lazy"></button>
+        <button class="thumb" data-full="03.jpg"><img src="03.jpg" alt="Photo 3" loading="lazy"></button>
+        <button class="thumb" data-full="04.jpg"><img src="04.jpg" alt="Photo 4" loading="lazy"></button>
+        <button class="thumb" data-full="05.jpg"><img src="05.jpg" alt="Photo 5" loading="lazy"></button>
+        <button class="thumb" data-full="06.jpg"><img src="06.jpg" alt="Photo 6" loading="lazy"></button>
+      </div>
+
+      <div class="divider"></div>
+      <button class="btn" id="btnSlideshow" type="button">▶ Start slideshow</button>
+      <p class="note">Slideshow uses your gallery photos (works offline).</p>
+    </div>
+  </section>
+
+  <!-- THANK YOU -->
+  <section class="section" id="wishes">
+    <div class="content">
+      <h2 class="section-title">Thank You</h2>
+      <p class="meta">
+        We look forward to celebrating with you.<br/>
+        See you on <strong>29 March 2026</strong> at <strong>5:00 PM</strong>.
+      </p>
+      <div class="divider"></div>
+      <a class="btn" href="#top">Back to Top</a>
+    </div>
+  </section>
+
+  <!-- NAV -->
+  <nav class="dock" aria-label="Quick navigation">
+    <a href="#top">Top</a>
+    <a href="#event">Event</a>
+    <a href="#location">Location</a>
+    <a href="#gallery">Gallery</a>
+  </nav>
+
+  <!-- LIGHTBOX -->
+  <div class="lightbox" id="lightbox" hidden>
+    <button class="lb-close" id="lbClose" aria-label="Close">×</button>
+    <img id="lbImg" alt="Full image" />
+  </div>
+
+  <!-- AUDIO -->
+  <audio id="bgMusic" preload="auto" loop>
+    <source src="music.mp3" type="audio/mpeg" />
+  </audio>
+
+  <script>
+    const EVENT = {
+      title: "Baksim & Kimly",
+      details: "You're invited to celebrate with us.",
+      locationName: "The Premier Center Sensok (Building D&E)",
+      startLocalISO: "2026-03-29T17:00:00+07:00",
+      endLocalISO:   "2026-03-29T19:00:00+07:00",
+      mapsUrl: "https://google.com/maps?rlz=1C1GCEU_enKH1181KH1181&gs_lcrp=EgZjaHJvbWUqCggAEAAY4wIYgAQyCggAEAAY4wIYgAQyDQgBEC4YrwEYxwEYgAQyBwgCEAAYgAQyBggDEEUYOTINCAQQLhivARjHARiABDIHCAUQLhiABDIHCAYQABiABDIHCAcQABiABDIHCAgQABiABDINCAkQLhivARjHARiABNIBCDMxNzBqMGo3qAIAsAIA&um=1&ie=UTF-8&fb=1&gl=kh&sa=X&geocode=KdGLHwrFUwkxMRKdi4cIgAHj&daddr=JV2M%2B35M,+Phnom+Penh"
+    };
+
+    const heroVideo = document.getElementById("heroVideo");
+    if (heroVideo){ heroVideo.play().catch(()=>{}); }
+
+    /* ===== BOKEH ===== */
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const layer = document.getElementById("bokehLayer");
+    function rand(min,max){ return Math.random()*(max-min)+min; }
+    function addBokeh(){
+      if (!layer || reduceMotion) return;
+      const dot = document.createElement("span");
+      dot.className = "bokeh";
+      const size = rand(6, 16);
+      dot.style.width = size + "px";
+      dot.style.height = size + "px";
+      dot.style.left = rand(-5, 105) + "vw";
+      dot.style.bottom = "-20px";
+      dot.style.animationDuration = rand(7, 14) + "s";
+      dot.style.animationDelay = rand(0, 2) + "s";
+      layer.appendChild(dot);
+      setTimeout(() => dot.remove(), 16000);
+    }
+    for (let i=0;i<18;i++) setTimeout(addBokeh, i*180);
+    setInterval(addBokeh, 420);
+
+    // Opening + Music
+    const openBtn = document.getElementById("openBtn");
+    const openingScreen = document.getElementById("openingScreen");
+    const audio = document.getElementById("bgMusic");
+
+    let musicStarted = false;
+    function startMusicOnce(){
+      if (musicStarted) return;
+      musicStarted = true;
+      audio.play().catch(()=>{});
+      removeMusicListeners();
+    }
+    function removeMusicListeners(){
+      document.removeEventListener("click", startMusicOnce);
+      document.removeEventListener("touchstart", startMusicOnce);
+      document.removeEventListener("scroll", startMusicOnce);
+      document.removeEventListener("keydown", startMusicOnce);
+    }
+
+    openBtn.addEventListener("click", () => {
+      startMusicOnce();
+      if (heroVideo){ heroVideo.play().catch(()=>{}); }
+      openingScreen.style.opacity = "0";
+      setTimeout(() => { openingScreen.style.display = "none"; }, 700);
+    });
+
+    document.addEventListener("click", startMusicOnce, { passive:true });
+    document.addEventListener("touchstart", startMusicOnce, { passive:true });
+    document.addEventListener("scroll", startMusicOnce, { passive:true });
+    document.addEventListener("keydown", startMusicOnce);
+
+    // Smooth scroll
+    document.addEventListener("click", (e) => {
+      const a = e.target.closest('a[href^="#"]');
+      if (!a) return;
+      const id = a.getAttribute("href");
+      const el = document.querySelector(id);
+      if (!el) return;
+      e.preventDefault();
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    // Countdown
+    const elDays = document.getElementById("dDays");
+    const elHours = document.getElementById("dHours");
+    const elMins = document.getElementById("dMins");
+    const elSecs = document.getElementById("dSecs");
+
+    function tickCountdown(){
+      const now = new Date();
+      const target = new Date(EVENT.startLocalISO);
+      const diff = target - now;
+
+      if (diff <= 0){
+        elDays.textContent = "0";
+        elHours.textContent = "0";
+        elMins.textContent = "0";
+        elSecs.textContent = "0";
+        return;
+      }
+
+      const sec = Math.floor(diff / 1000);
+      const days = Math.floor(sec / 86400);
+      const hours = Math.floor((sec % 86400) / 3600);
+      const mins = Math.floor((sec % 3600) / 60);
+      const secs = sec % 60;
+
+      elDays.textContent = String(days);
+      elHours.textContent = String(hours).padStart(2,"0");
+      elMins.textContent = String(mins).padStart(2,"0");
+      elSecs.textContent = String(secs).padStart(2,"0");
+    }
+    tickCountdown();
+    setInterval(tickCountdown, 1000);
+
+    // Google Calendar
+    function toGoogleCalDate(isoWithOffset){
+      const d = new Date(isoWithOffset);
+      const pad = (n) => String(n).padStart(2, "0");
+      return (
+        d.getUTCFullYear() +
+        pad(d.getUTCMonth()+1) +
+        pad(d.getUTCDate()) +
+        "T" +
+        pad(d.getUTCHours()) +
+        pad(d.getUTCMinutes()) +
+        pad(d.getUTCSeconds()) +
+        "Z"
+      );
+    }
+
+    document.getElementById("btnCalendar").addEventListener("click", () => {
+      const start = toGoogleCalDate(EVENT.startLocalISO);
+      const end   = toGoogleCalDate(EVENT.endLocalISO);
+
+      const url = new URL("https://calendar.google.com/calendar/render");
+      url.searchParams.set("action", "TEMPLATE");
+      url.searchParams.set("text", EVENT.title);
+      url.searchParams.set("dates", `${start}/${end}`);
+      url.searchParams.set("details", EVENT.details);
+      url.searchParams.set("location", EVENT.locationName);
+
+      window.open(url.toString(), "_blank", "noopener");
+    });
+
+    // Maps
+    document.getElementById("btnMaps").addEventListener("click", () => {
+      window.open(EVENT.mapsUrl, "_blank", "noopener");
+    });
+
+    document.getElementById("btnCopyMap").addEventListener("click", async () => {
+      try{
+        await navigator.clipboard.writeText(EVENT.mapsUrl);
+        alert("Map link copied!");
+      }catch(e){
+        prompt("Copy this link:", EVENT.mapsUrl);
+      }
+    });
+
+    // QR
+    const qrImg = document.getElementById("qrImg");
+    const qrFallback = document.getElementById("qrFallback");
+    function showQRFallback(){ qrFallback.style.display = "block"; }
+    qrImg.addEventListener("error", showQRFallback);
+
+    document.getElementById("btnGenQR").addEventListener("click", () => {
+      const qrUrl = "https://chart.googleapis.com/chart?cht=qr&chs=500x500&chl=" + encodeURIComponent(EVENT.mapsUrl);
+      qrFallback.style.display = "none";
+      qrImg.style.display = "block";
+      qrImg.src = qrUrl;
+      alert("QR generated (online). For offline, create qr.png and put it in the folder.");
+    });
+
+    // Gallery Lightbox + Slideshow
+    const lb = document.getElementById("lightbox");
+    const lbImg = document.getElementById("lbImg");
+    const lbClose = document.getElementById("lbClose");
+    const thumbs = Array.from(document.querySelectorAll(".thumb"));
+    let slideTimer = null;
+    let slideIndex = 0;
+
+    function openLb(src){
+      lbImg.src = src;
+      lb.hidden = false;
+      document.body.style.overflow = "hidden";
+    }
+    function closeLb(){
+      lb.hidden = true;
+      lbImg.src = "";
+      document.body.style.overflow = "";
+      stopSlideshow();
+    }
+    lbClose.addEventListener("click", closeLb);
+    lb.addEventListener("click", (e) => { if (e.target === lb) closeLb(); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !lb.hidden) closeLb(); });
+
+    thumbs.forEach(btn => btn.addEventListener("click", () => {
+      slideIndex = thumbs.indexOf(btn);
+      openLb(btn.dataset.full);
+    }));
+
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(en => { if (en.isIntersecting) en.target.classList.add("show"); });
+    }, { threshold: 0.15 });
+    thumbs.forEach(t => io.observe(t));
+
+    function startSlideshow(){
+      if (slideTimer) return;
+      if (thumbs.length === 0) return;
+      openLb(thumbs[slideIndex].dataset.full);
+      slideTimer = setInterval(() => {
+        slideIndex = (slideIndex + 1) % thumbs.length;
+        lbImg.src = thumbs[slideIndex].dataset.full;
+      }, 2200);
+      document.getElementById("btnSlideshow").textContent = "⏸ Stop slideshow";
+    }
+    function stopSlideshow(){
+      if (!slideTimer) return;
+      clearInterval(slideTimer);
+      slideTimer = null;
+      document.getElementById("btnSlideshow").textContent = "▶ Start slideshow";
+    }
+
+    document.getElementById("btnSlideshow").addEventListener("click", () => {
+      if (slideTimer) stopSlideshow();
+      else startSlideshow();
+    });
+  </script>
+</body>
+</html>
