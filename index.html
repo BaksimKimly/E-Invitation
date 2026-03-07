@@ -38,7 +38,7 @@
       scroll-behavior:smooth;
       -webkit-text-size-adjust:100%;
       width:100vw;
-      height:100vh;
+      min-height:100svh; /* Fixed scrolling bug */
     }
 
     .bg-wrap{
@@ -434,15 +434,15 @@
       transition:transform .25s ease;
     }
 
-    /* UPDATED DOCK TO TOP WITH BUBBLE STYLING */
+    /* TOP DOCK NAVIGATION */
     .dock{
       position:fixed;
       left:50%;
-      top:max(15px, env(safe-area-inset-top)); /* Moved to top */
+      top:max(15px, env(safe-area-inset-top)); 
       transform:translateX(-50%);
       display:flex;
       gap:4px;
-      padding:6px; /* Uniform padding for bubble math */
+      padding:6px; 
       border-radius:999px;
       background:rgba(0,0,0,.85);
       border:1px solid rgba(255,215,150,.20);
@@ -456,18 +456,18 @@
       box-shadow:0 6px 20px rgba(0,0,0,0.5);
     }
 
-    /* The moving gold bubble */
+    /* THE BUBBLE - Transparent with Gold Border */
     .dock-bubble {
       position:absolute;
       top:6px;
       bottom:6px;
       left:0;
       width:0;
-      background:linear-gradient(90deg, var(--gold-3) 0%, var(--gold-1) 100%);
+      background:transparent; /* Inside is transparent */
+      border:1px solid rgba(255, 215, 150, 0.65); /* Gold Border */
       border-radius:999px;
-      z-index:1; /* Sits behind text */
+      z-index:1; 
       transition:all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-      box-shadow:0 2px 8px rgba(0,0,0,0.4);
     }
 
     .dock a{
@@ -479,14 +479,13 @@
       font-size:clamp(9px, 2.5vw, 13px);
       white-space:nowrap;
       position:relative;
-      z-index:2; /* Sits above bubble */
-      transition:color 0.3s ease, text-shadow 0.3s ease;
+      z-index:2; 
+      transition:color 0.3s ease, font-weight 0.3s ease;
     }
 
     .dock a.active {
       color:#fff;
       font-weight:600;
-      text-shadow:0 1px 4px rgba(0,0,0,0.8);
     }
 
     .qrwrap{
@@ -942,13 +941,68 @@
         openingScreen.style.display = "none";
         document.body.style.overflow = "";
         setRealViewportHeight();
-        updateDockBubble(); // Make sure bubble positions right when opened
+        // Trigger bubble calculation once layout stabilizes
+        const activeLink = document.querySelector('.dock a.active') || document.querySelector('.dock a');
+        moveBubble(activeLink);
       }, 850);
     });
 
     document.addEventListener("click", startMusicOnce, { passive: true });
     document.addEventListener("touchstart", startMusicOnce, { passive: true });
 
+    /* --- NEW & IMPROVED SCROLL TRACKER --- */
+    const navDock = document.getElementById('navDock');
+    const dockBubble = document.getElementById('dockBubble');
+    const navLinks = document.querySelectorAll('.dock a');
+
+    // Helper function to animate the bubble smoothly to the active link
+    function moveBubble(targetLink) {
+      if (!targetLink || !dockBubble || !navDock) return;
+      
+      const linkRect = targetLink.getBoundingClientRect();
+      const dockRect = navDock.getBoundingClientRect();
+      
+      const leftPos = linkRect.left - dockRect.left;
+      
+      dockBubble.style.width = `${linkRect.width}px`;
+      dockBubble.style.transform = `translateX(${leftPos}px)`;
+      
+      navLinks.forEach(link => link.classList.remove('active'));
+      targetLink.classList.add('active');
+    }
+
+    // Set up modern scroll observer
+    if ('IntersectionObserver' in window) {
+      const sections = ['top', 'event', 'gallery', 'location'].map(id => document.getElementById(id));
+      
+      const observerOptions = {
+        root: null,
+        rootMargin: '-30% 0px -50% 0px', // Triggers when a section enters the main viewing area
+        threshold: 0
+      };
+
+      const scrollObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const activeId = entry.target.id;
+            const targetLink = document.querySelector(`.dock a[href="#${activeId}"]`);
+            moveBubble(targetLink);
+          }
+        });
+      }, observerOptions);
+
+      sections.forEach(sec => {
+        if (sec) scrollObserver.observe(sec);
+      });
+    }
+
+    // Recalculate bubble if screen rotates or resizes
+    window.addEventListener('resize', () => {
+      const activeLink = document.querySelector('.dock a.active');
+      moveBubble(activeLink);
+    });
+
+    // Smooth scroll overriding
     document.addEventListener("click", (e) => {
       const a = e.target.closest('a[href^="#"]');
       if (!a) return;
@@ -958,49 +1012,9 @@
 
       e.preventDefault();
       target.scrollIntoView({ behavior: "smooth", block: "start" });
+      moveBubble(a); // instantly move bubble on click
     });
-
-    /* --- SCROLL SPY FOR MENU BUBBLE --- */
-    const navDock = document.getElementById('navDock');
-    const dockBubble = document.getElementById('dockBubble');
-    const navLinks = document.querySelectorAll('.dock a');
-    const sectionsForSpy = [
-      document.getElementById('top'),
-      document.getElementById('event'),
-      document.getElementById('gallery'),
-      document.getElementById('location')
-    ];
-
-    function updateDockBubble() {
-      if (!navDock || !dockBubble) return;
-      let currentIdx = 0;
-      const scrollY = window.scrollY;
-      
-      sectionsForSpy.forEach((sec, idx) => {
-        if (!sec) return;
-        // Changes highlight right before the section reaches the middle of the screen
-        if (sec.offsetTop - window.innerHeight / 3 <= scrollY) {
-          currentIdx = idx;
-        }
-      });
-
-      navLinks.forEach((link, idx) => {
-        if (idx === currentIdx) {
-          link.classList.add('active');
-          const linkRect = link.getBoundingClientRect();
-          const dockRect = navDock.getBoundingClientRect();
-          dockBubble.style.width = `${linkRect.width}px`;
-          dockBubble.style.transform = `translateX(${linkRect.left - dockRect.left}px)`;
-        } else {
-          link.classList.remove('active');
-        }
-      });
-    }
-
-    window.addEventListener('scroll', updateDockBubble, {passive: true});
-    window.addEventListener('resize', updateDockBubble);
-    setTimeout(updateDockBubble, 100);
-    /* ---------------------------------- */
+    /* -------------------------------------- */
 
     const elDays = document.getElementById("dDays");
     const elHours = document.getElementById("dHours");
