@@ -434,24 +434,40 @@
       transition:transform .25s ease;
     }
 
+    /* UPDATED DOCK TO TOP WITH BUBBLE STYLING */
     .dock{
       position:fixed;
       left:50%;
-      bottom:max(15px, env(safe-area-inset-bottom));
+      top:max(15px, env(safe-area-inset-top)); /* Moved to top */
       transform:translateX(-50%);
       display:flex;
       gap:4px;
-      padding:8px;
+      padding:6px; /* Uniform padding for bubble math */
       border-radius:999px;
-      background:rgba(0,0,0,.75);
+      background:rgba(0,0,0,.85);
       border:1px solid rgba(255,215,150,.20);
-      backdrop-filter:blur(10px);
-      -webkit-backdrop-filter:blur(10px);
+      backdrop-filter:blur(12px);
+      -webkit-backdrop-filter:blur(12px);
       z-index:9000;
       letter-spacing:.02em;
       width:90%;
       max-width:380px;
       justify-content:space-between;
+      box-shadow:0 6px 20px rgba(0,0,0,0.5);
+    }
+
+    /* The moving gold bubble */
+    .dock-bubble {
+      position:absolute;
+      top:6px;
+      bottom:6px;
+      left:0;
+      width:0;
+      background:linear-gradient(90deg, var(--gold-3) 0%, var(--gold-1) 100%);
+      border-radius:999px;
+      z-index:1; /* Sits behind text */
+      transition:all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+      box-shadow:0 2px 8px rgba(0,0,0,0.4);
     }
 
     .dock a{
@@ -460,8 +476,17 @@
       padding:8px 4px;
       border-radius:999px;
       color:rgba(255,255,255,.88);
-      font-size:clamp(10px, 3vw, 13px);
+      font-size:clamp(9px, 2.5vw, 13px);
       white-space:nowrap;
+      position:relative;
+      z-index:2; /* Sits above bubble */
+      transition:color 0.3s ease, text-shadow 0.3s ease;
+    }
+
+    .dock a.active {
+      color:#fff;
+      font-weight:600;
+      text-shadow:0 1px 4px rgba(0,0,0,0.8);
     }
 
     .qrwrap{
@@ -728,8 +753,9 @@
     </div>
   </div>
 
-  <nav class="dock" aria-label="Quick navigation">
-    <a href="#top">Top</a>
+  <nav class="dock" aria-label="Quick navigation" id="navDock">
+    <div class="dock-bubble" id="dockBubble"></div>
+    <a href="#top" class="active">Top</a>
     <a href="#event">Event</a>
     <a href="#gallery">Photo Gallery</a>
     <a href="#location">Location</a>
@@ -916,6 +942,7 @@
         openingScreen.style.display = "none";
         document.body.style.overflow = "";
         setRealViewportHeight();
+        updateDockBubble(); // Make sure bubble positions right when opened
       }, 850);
     });
 
@@ -932,6 +959,48 @@
       e.preventDefault();
       target.scrollIntoView({ behavior: "smooth", block: "start" });
     });
+
+    /* --- SCROLL SPY FOR MENU BUBBLE --- */
+    const navDock = document.getElementById('navDock');
+    const dockBubble = document.getElementById('dockBubble');
+    const navLinks = document.querySelectorAll('.dock a');
+    const sectionsForSpy = [
+      document.getElementById('top'),
+      document.getElementById('event'),
+      document.getElementById('gallery'),
+      document.getElementById('location')
+    ];
+
+    function updateDockBubble() {
+      if (!navDock || !dockBubble) return;
+      let currentIdx = 0;
+      const scrollY = window.scrollY;
+      
+      sectionsForSpy.forEach((sec, idx) => {
+        if (!sec) return;
+        // Changes highlight right before the section reaches the middle of the screen
+        if (sec.offsetTop - window.innerHeight / 3 <= scrollY) {
+          currentIdx = idx;
+        }
+      });
+
+      navLinks.forEach((link, idx) => {
+        if (idx === currentIdx) {
+          link.classList.add('active');
+          const linkRect = link.getBoundingClientRect();
+          const dockRect = navDock.getBoundingClientRect();
+          dockBubble.style.width = `${linkRect.width}px`;
+          dockBubble.style.transform = `translateX(${linkRect.left - dockRect.left}px)`;
+        } else {
+          link.classList.remove('active');
+        }
+      });
+    }
+
+    window.addEventListener('scroll', updateDockBubble, {passive: true});
+    window.addEventListener('resize', updateDockBubble);
+    setTimeout(updateDockBubble, 100);
+    /* ---------------------------------- */
 
     const elDays = document.getElementById("dDays");
     const elHours = document.getElementById("dHours");
