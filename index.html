@@ -12,17 +12,17 @@
 
   <style>
     :root{
-      --bg:#000000;
+      --bg:#060606;
       --fg:#f3f3f3;
       --muted:rgba(255,255,255,.78);
       --card:rgba(0,0,0,.45);
       --border:rgba(255,255,255,.16);
       --shadow:0 14px 50px rgba(0,0,0,.58);
       --radius:18px;
-      --gold-1:#555555;
-      --gold-2:#cccccc;
-      --gold-3:#ffffff;
-      --gold-4:#eeeeee;
+      --gold-1:#6b4a1e;
+      --gold-2:#f6e27a;
+      --gold-3:#cfa34f;
+      --gold-4:#fff1b0;
       --vh:1vh;
     }
 
@@ -32,7 +32,7 @@
       margin:0;
       padding:0;
       font-family:"Cormorant Garamond", serif;
-      background:#050505 radial-gradient(circle at 50% 50%, #1a1a1a 0%, #000000 100%);
+      background:#080604 radial-gradient(circle at 50% 50%, #1c140a 0%, #060402 100%);
       color:var(--fg);
       overflow-x:hidden;
       scroll-behavior:smooth;
@@ -53,8 +53,8 @@
       overflow:hidden;
       background:#050505;
       box-shadow:0 0 50px rgba(0,0,0,0.8);
-      border-left:1px solid rgba(255,255,255,0.15);
-      border-right:1px solid rgba(255,255,255,0.15);
+      border-left:1px solid rgba(255,215,150,0.15);
+      border-right:1px solid rgba(255,215,150,0.15);
     }
 
     .bg-video{
@@ -434,18 +434,18 @@
       transition:transform .25s ease;
     }
 
-    /* BOTTOM DOCK NAVIGATION - Updated to Frosted White */
+    /* --- BOTTOM DOCK NAVIGATION (WHITE) --- */
     .dock{
       position:fixed;
       left:50%;
-      bottom:max(15px, env(safe-area-inset-bottom)); 
+      bottom:max(15px, env(safe-area-inset-bottom));
       transform:translateX(-50%);
       display:flex;
       gap:4px;
       padding:6px; 
       border-radius:999px;
-      background:rgba(255,255,255,.92); /* Frosted White */
-      border:1px solid rgba(0,0,0,.15); /* Subtle dark edge */
+      background:rgba(255,255,255,.92); /* White bar */
+      border:1px solid rgba(255,215,150,.40); /* Subtle gold border to match theme */
       backdrop-filter:blur(12px);
       -webkit-backdrop-filter:blur(12px);
       z-index:9000;
@@ -453,21 +453,21 @@
       width:90%;
       max-width:380px;
       justify-content:space-between;
-      box-shadow:0 10px 30px rgba(0,0,0,0.6); /* Larger shadow to lift it off the dark page */
+      box-shadow:0 8px 30px rgba(0,0,0,0.7);
     }
 
-    /* THE BUBBLE - Solid Dark/Silver Pill with shadow */
+    /* THE BUBBLE - Dark Premium Pill */
     .dock-bubble {
       position:absolute;
       top:6px;
       bottom:6px;
       left:0;
       width:0;
-      background: linear-gradient(135deg, #3a3a3a, #0a0a0a); /* Dark silver to black gradient */
-      border: 1px solid #444; /* Clean edge */
+      background: linear-gradient(135deg, #1a1a1a, #000000); /* Dark/black pill */
+      border: 1px solid rgba(255, 215, 150, 0.35); /* Elegant gold edge on bubble */
       border-radius:999px;
       z-index:1; 
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.2); /* 3D drop-shadow and inner shine */
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
       transition:all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
     }
 
@@ -476,8 +476,8 @@
       text-align:center;
       padding:8px 4px;
       border-radius:999px;
-      color:rgba(0,0,0,.65); /* Dark gray text for unselected items on the white background */
-      font-size:clamp(9px, 2.5vw, 13px);
+      color:#555555; /* Dark gray text so you can read it on the white background */
+      font-size:clamp(10px, 3vw, 13px);
       white-space:nowrap;
       position:relative;
       z-index:2; 
@@ -485,9 +485,10 @@
     }
 
     .dock a.active {
-      color:#fff; /* Pops to white when it sits on top of the dark bubble */
+      color:#ffffff; /* Turns bright white when the dark bubble is behind it */
       font-weight:600;
     }
+    /* -------------------------------------- */
 
     .qrwrap{
       display:flex;
@@ -951,7 +952,7 @@
     document.addEventListener("click", startMusicOnce, { passive: true });
     document.addEventListener("touchstart", startMusicOnce, { passive: true });
 
-    /* --- NEW & IMPROVED SCROLL TRACKER --- */
+    /* --- SCROLL TRACKER --- */
     const navDock = document.getElementById('navDock');
     const dockBubble = document.getElementById('dockBubble');
     const navLinks = document.querySelectorAll('.dock a');
