@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="scroll-lock">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
@@ -28,6 +28,16 @@
 
     *{ box-sizing:border-box; }
 
+    /* --- STRICT SCROLL LOCK (FOOLPROOF) --- */
+    .scroll-lock {
+      overflow: hidden !important;
+      height: 100vh !important;
+      height: 100svh !important;
+      width: 100vw !important;
+      position: fixed !important; /* This stops iPhones from bypassing the lock */
+      touch-action: none !important;
+    }
+
     html, body{
       margin:0;
       padding:0;
@@ -39,12 +49,6 @@
       -webkit-text-size-adjust:100%;
       width:100vw;
       min-height:100svh;
-    }
-
-    /* Scroll Lock Class for the Intro Screen */
-    body.scroll-lock {
-      overflow: hidden;
-      touch-action: none; /* Prevents mobile swiping */
     }
 
     .bg-wrap{
@@ -195,7 +199,7 @@
 
     .open-sub{
       font-family:"Great Vibes", cursive;
-      font-size:clamp(24px, 6vw, 34px); /* Slightly smaller text */
+      font-size:clamp(24px, 6vw, 34px);
       line-height:1.1;
       letter-spacing:.02em;
       margin:0;
@@ -211,9 +215,9 @@
       position:relative;
       display:inline-block;
       width:100%;
-      max-width:380px; /* Bigger logo max-width */
+      max-width:380px; 
       line-height:0;
-      margin:35px 0; /* Same exact spacing */
+      margin:35px 0; 
       animation:logoFloat 3.8s ease-in-out infinite;
     }
 
@@ -741,9 +745,7 @@
     }
   </style>
 </head>
-<body class="scroll-lock">
-
-  <div class="bg-wrap" aria-hidden="true">
+<body class="scroll-lock"> <div class="bg-wrap" aria-hidden="true">
     <div class="fallback-bg"></div>
     <video class="bg-video" id="heroVideo" autoplay muted loop playsinline webkit-playsinline preload="auto">
       <source src="hero.mp4" type="video/mp4" />
@@ -953,7 +955,8 @@
       setTimeout(() => {
         openingScreen.style.display = "none";
         
-        // UNLOCKS THE SCROLL ONCE BUTTON IS CLICKED
+        // --- UNLOCKS THE SCROLLING ---
+        document.documentElement.classList.remove("scroll-lock");
         document.body.classList.remove("scroll-lock");
         
         setRealViewportHeight();
