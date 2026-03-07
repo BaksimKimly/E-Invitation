@@ -28,14 +28,10 @@
 
     *{ box-sizing:border-box; }
 
-    /* --- STRICT SCROLL LOCK (FOOLPROOF) --- */
-    .scroll-lock {
-      overflow: hidden !important;
-      height: 100vh !important;
-      height: 100svh !important;
-      width: 100vw !important;
-      position: fixed !important; 
-      touch-action: none !important;
+    .scroll-lock{
+      overflow:hidden !important;
+      height:100svh !important;
+      touch-action:none !important;
     }
 
     html, body{
@@ -47,8 +43,12 @@
       overflow-x:hidden;
       scroll-behavior:smooth;
       -webkit-text-size-adjust:100%;
-      width:100vw;
+      width:100%;
       min-height:100svh;
+    }
+
+    body{
+      position:relative;
     }
 
     .bg-wrap{
@@ -136,6 +136,8 @@
       font:inherit;
       border:none;
       outline:none;
+      background:none;
+      -webkit-tap-highlight-color:transparent;
     }
 
     #openingScreen{
@@ -154,6 +156,7 @@
       min-height:calc(var(--vh) * 100);
       padding:20px;
       transition:opacity .85s ease, visibility .85s ease;
+      visibility:visible;
     }
 
     #openingScreen.is-leaving{
@@ -215,9 +218,9 @@
       position:relative;
       display:inline-block;
       width:100%;
-      max-width:380px; 
+      max-width:380px;
       line-height:0;
-      margin:35px 0; 
+      margin:35px 0;
       animation:logoFloat 3.8s ease-in-out infinite;
     }
 
@@ -248,6 +251,12 @@
       transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
     }
 
+    .open-btn--lux:hover{
+      transform:translateY(-1px);
+      box-shadow:0 14px 30px rgba(0,0,0,.34);
+      border-color:rgba(255,235,190,.55);
+    }
+
     .open-btn__label{
       position:relative;
       z-index:1;
@@ -265,14 +274,6 @@
       text-shadow:0 0 10px rgba(255,220,150,.08);
     }
 
-    .open-hint{
-      margin:12px 0 0;
-      font-size:13px;
-      letter-spacing:.30em;
-      text-transform:uppercase;
-      color:rgba(255,255,255,.62);
-    }
-
     .hero, .section{
       width:100%;
       min-height:calc(var(--vh) * 100);
@@ -280,6 +281,7 @@
       align-items:center;
       justify-content:center;
       padding:max(18px, env(safe-area-inset-top)) 15px max(90px, calc(env(safe-area-inset-bottom) + 70px)) 15px;
+      scroll-margin-top:20px;
     }
 
     .hero{ opacity:0; }
@@ -352,6 +354,11 @@
       flex:1 1 auto;
     }
 
+    .pill:hover, .btn:hover{
+      transform:translateY(-1px);
+      background:rgba(255,255,255,.13);
+    }
+
     .btn{
       display:inline-block;
       margin-top:14px;
@@ -408,127 +415,122 @@
       text-transform:uppercase;
     }
 
-    /* --- BEAUTIFUL MASONRY GALLERY GRID --- */
-    .grid {
-      margin-top: 20px;
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      grid-auto-rows: 140px; /* Fixed block height creates puzzle pieces */
-      grid-auto-flow: dense; /* Fills in empty spaces perfectly */
-      gap: 10px;
-      width: 100%;
+    .grid{
+      margin-top:20px;
+      display:grid;
+      grid-template-columns:repeat(2, 1fr);
+      grid-auto-rows:140px;
+      grid-auto-flow:dense;
+      gap:10px;
+      width:100%;
     }
 
-    .thumb {
-      border: 1px solid rgba(255, 215, 150, 0.15); /* Subtle gold frame */
-      padding: 0;
-      border-radius: 14px;
-      overflow: hidden;
-      cursor: pointer;
-      background: transparent;
-      position: relative;
-      transform: translateY(24px); /* For reveal animation */
-      opacity: 0;
-      transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.6s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-      width: 100%;
-      height: 100%;
+    .thumb{
+      border:1px solid rgba(255,215,150,0.15);
+      padding:0;
+      border-radius:14px;
+      overflow:hidden;
+      cursor:pointer;
+      background:transparent;
+      position:relative;
+      transform:translateY(24px);
+      opacity:0;
+      transition:transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.6s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+      width:100%;
+      height:100%;
     }
 
-    .thumb.show {
-      transform: translateY(0);
-      opacity: 1;
+    .thumb.show{
+      transform:translateY(0);
+      opacity:1;
     }
 
-    .thumb img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), filter 0.4s ease;
-      filter: brightness(0.85) contrast(1.1); /* Moody lighting by default */
+    .thumb img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+      transition:transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), filter 0.4s ease;
+      filter:brightness(0.85) contrast(1.1);
     }
 
-    /* Hover interactions */
-    .thumb:hover {
-      border-color: rgba(207, 163, 79, 0.8); /* Gold glow edge */
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9), 0 0 20px rgba(207, 163, 79, 0.35); /* Outer glow */
-      z-index: 2;
+    .thumb:hover{
+      border-color:rgba(207, 163, 79, 0.8);
+      box-shadow:0 10px 30px rgba(0, 0, 0, 0.9), 0 0 20px rgba(207, 163, 79, 0.35);
+      z-index:2;
     }
 
-    .thumb:hover img {
-      transform: scale(1.08); /* Zoom in */
-      filter: brightness(1.1) contrast(1.1); /* Light up */
+    .thumb:hover img{
+      transform:scale(1.08);
+      filter:brightness(1.1) contrast(1.1);
     }
 
-    /* The magic code that builds the collage shape! */
-    .thumb:nth-child(6n + 1) {
-      grid-column: span 2; /* Large Landscape */
-      grid-row: span 2;
-    }
-    .thumb:nth-child(6n + 4) {
-      grid-row: span 2; /* Tall Portrait */
-    }
-    /* ----------------------------------------- */
-
-    /* --- THEME-MATCHED DARK GLASS DOCK --- */
-    .dock {
-      position: fixed;
-      left: 50%;
-      bottom: max(15px, env(safe-area-inset-bottom));
-      transform: translateX(-50%);
-      display: flex;
-      gap: 4px;
-      padding: 6px; 
-      border-radius: 999px;
-      
-      background: rgba(20, 16, 12, 0.55); 
-      border: 1px solid rgba(255, 215, 150, 0.2); 
-      backdrop-filter: blur(20px) saturate(150%);
-      -webkit-backdrop-filter: blur(20px) saturate(150%);
-      
-      z-index: 9000;
-      letter-spacing: .02em;
-      width: 90%;
-      max-width: 380px;
-      justify-content: space-between;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+    .thumb:nth-child(6n + 1){
+      grid-column:span 2;
+      grid-row:span 2;
     }
 
-    /* THE BUBBLE - Golden glass effect */
-    .dock-bubble {
-      position: absolute;
-      top: 6px;
-      bottom: 6px;
-      left: 0;
-      width: 0;
-      background: linear-gradient(135deg, rgba(207, 163, 79, 0.25), rgba(207, 163, 79, 0.05)); 
-      border: 1px solid rgba(207, 163, 79, 0.5); 
-      border-radius: 999px;
-      z-index: 1; 
-      box-shadow: 
-        0 4px 15px rgba(207, 163, 79, 0.25), 
-        inset 0 1px 4px rgba(255, 255, 255, 0.15); 
-      transition: all 0.45s cubic-bezier(0.25, 1, 0.3, 1);
+    .thumb:nth-child(6n + 4){
+      grid-row:span 2;
     }
 
-    .dock a {
-      flex: 1;
-      text-align: center;
-      padding: 8px 4px;
-      border-radius: 999px;
-      color: rgba(255, 255, 255, 0.65);
-      font-size: clamp(10px, 3vw, 13px);
-      white-space: nowrap;
-      position: relative;
-      z-index: 2; 
-      transition: color 0.3s ease, font-weight 0.3s ease, transform 0.3s ease;
+    .dock{
+      position:fixed;
+      left:50%;
+      bottom:max(15px, env(safe-area-inset-bottom));
+      transform:translateX(-50%);
+      display:flex;
+      gap:4px;
+      padding:6px;
+      border-radius:999px;
+      background:rgba(20, 16, 12, 0.55);
+      border:1px solid rgba(255, 215, 150, 0.2);
+      backdrop-filter:blur(20px) saturate(150%);
+      -webkit-backdrop-filter:blur(20px) saturate(150%);
+      z-index:9000;
+      letter-spacing:.02em;
+      width:90%;
+      max-width:380px;
+      justify-content:space-between;
+      box-shadow:0 10px 40px rgba(0,0,0,0.8);
     }
 
-    .dock a.active {
-      color: #ffffff; 
-      font-weight: 700;
-      transform: scale(1.05); 
-      text-shadow: 0 2px 5px rgba(0,0,0,0.6); 
+    .dock-bubble{
+      position:absolute;
+      top:6px;
+      bottom:6px;
+      left:0;
+      width:0;
+      background:linear-gradient(135deg, rgba(207, 163, 79, 0.25), rgba(207, 163, 79, 0.05));
+      border:1px solid rgba(207, 163, 79, 0.5);
+      border-radius:999px;
+      z-index:1;
+      box-shadow:
+        0 4px 15px rgba(207, 163, 79, 0.25),
+        inset 0 1px 4px rgba(255, 255, 255, 0.15);
+      transition:all 0.45s cubic-bezier(0.25, 1, 0.3, 1);
+      transform:translateX(0);
+      pointer-events:none;
+    }
+
+    .dock a{
+      flex:1;
+      text-align:center;
+      padding:8px 4px;
+      border-radius:999px;
+      color:rgba(255, 255, 255, 0.65);
+      font-size:clamp(10px, 3vw, 13px);
+      white-space:nowrap;
+      position:relative;
+      z-index:2;
+      transition:color 0.3s ease, font-weight 0.3s ease, transform 0.3s ease;
+    }
+
+    .dock a.active{
+      color:#ffffff;
+      font-weight:700;
+      transform:scale(1.05);
+      text-shadow:0 2px 5px rgba(0,0,0,0.6);
     }
 
     .qrwrap{
@@ -700,6 +702,34 @@
       box-shadow:0 12px 35px rgba(0,0,0,.45);
     }
 
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:calc(max(15px, env(safe-area-inset-bottom)) + 82px);
+      transform:translateX(-50%) translateY(12px);
+      width:max-content;
+      max-width:min(90vw, 360px);
+      padding:12px 16px;
+      border-radius:12px;
+      border:1px solid rgba(255,215,150,.22);
+      background:rgba(20,16,12,.78);
+      color:rgba(255,255,255,.92);
+      box-shadow:0 10px 30px rgba(0,0,0,.38);
+      backdrop-filter:blur(12px);
+      -webkit-backdrop-filter:blur(12px);
+      z-index:11000;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .25s ease, transform .25s ease;
+      text-align:center;
+      font-size:14px;
+    }
+
+    .toast.show{
+      opacity:1;
+      transform:translateX(-50%) translateY(0);
+    }
+
     @keyframes goldShift{
       0%{ background-position:0% 50%; }
       50%{ background-position:100% 50%; }
@@ -769,9 +799,17 @@
       font-size:26px;
       cursor:pointer;
     }
+
+    @media (prefers-reduced-motion: reduce){
+      *{
+        animation:none !important;
+        transition:none !important;
+        scroll-behavior:auto !important;
+      }
+    }
   </style>
 </head>
-<body class="scroll-lock"> 
+<body class="scroll-lock">
 
   <div class="bg-wrap" aria-hidden="true">
     <div class="fallback-bg"></div>
@@ -807,6 +845,8 @@
     <button class="lb-close" id="lbClose" aria-label="Close">×</button>
     <img id="lbImg" alt="Full image" />
   </div>
+
+  <div class="toast" id="toast"></div>
 
   <div id="fitViewport">
     <div id="fitRoot">
@@ -847,7 +887,7 @@
           <p class="held-line">Which will be held on</p>
           <p class="date-row">Sunday • 29 March 2026 • 5:00 PM</p>
           <p class="venue-line">
-            At The Premier Center Sensok (Building D&E)<br>
+            At The Premier Center Sensok (Building D&amp;E)<br>
             Phnom Penh, Cambodia
           </p>
 
@@ -885,15 +925,15 @@
             <button class="thumb" data-full="02.jpg"><img src="02.jpg" alt="Photo 2" loading="lazy"></button>
             <button class="thumb" data-full="03.jpg"><img src="03.jpg" alt="Photo 3" loading="lazy"></button>
             <button class="thumb" data-full="04.jpg"><img src="04.jpg" alt="Photo 4" loading="lazy"></button>
-            <button class="thumb" data-full="02.jpg"><img src="02.jpg" alt="Photo 2" loading="lazy"></button>
-            <button class="thumb" data-full="01.jpg"><img src="01.jpg" alt="Photo 1" loading="lazy"></button>
-            
-            <button class="thumb" data-full="04.jpg"><img src="04.jpg" alt="Photo 4" loading="lazy"></button>
-            <button class="thumb" data-full="03.jpg"><img src="03.jpg" alt="Photo 3" loading="lazy"></button>
-            <button class="thumb" data-full="01.jpg"><img src="01.jpg" alt="Photo 1" loading="lazy"></button>
-            <button class="thumb" data-full="02.jpg"><img src="02.jpg" alt="Photo 2" loading="lazy"></button>
-            <button class="thumb" data-full="04.jpg"><img src="04.jpg" alt="Photo 4" loading="lazy"></button>
-            <button class="thumb" data-full="03.jpg"><img src="03.jpg" alt="Photo 3" loading="lazy"></button>
+            <button class="thumb" data-full="02.jpg"><img src="02.jpg" alt="Photo 5" loading="lazy"></button>
+            <button class="thumb" data-full="01.jpg"><img src="01.jpg" alt="Photo 6" loading="lazy"></button>
+
+            <button class="thumb" data-full="04.jpg"><img src="04.jpg" alt="Photo 7" loading="lazy"></button>
+            <button class="thumb" data-full="03.jpg"><img src="03.jpg" alt="Photo 8" loading="lazy"></button>
+            <button class="thumb" data-full="01.jpg"><img src="01.jpg" alt="Photo 9" loading="lazy"></button>
+            <button class="thumb" data-full="02.jpg"><img src="02.jpg" alt="Photo 10" loading="lazy"></button>
+            <button class="thumb" data-full="04.jpg"><img src="04.jpg" alt="Photo 11" loading="lazy"></button>
+            <button class="thumb" data-full="03.jpg"><img src="03.jpg" alt="Photo 12" loading="lazy"></button>
           </div>
 
           <div class="divider"></div>
@@ -905,7 +945,7 @@
         <div class="content">
           <h2 class="section-title">Location</h2>
           <p class="meta">
-            <strong>The Premier Center Sensok (Building D&E)</strong><br>
+            <strong>The Premier Center Sensok (Building D&amp;E)</strong><br>
             Phnom Penh, Cambodia
           </p>
 
@@ -961,15 +1001,42 @@
     const openingScreen = document.getElementById("openingScreen");
     const audio = document.getElementById("bgMusic");
 
+    const navDock = document.getElementById("navDock");
+    const dockBubble = document.getElementById("dockBubble");
+    const navLinks = document.querySelectorAll(".dock a");
+
+    const elDays = document.getElementById("dDays");
+    const elHours = document.getElementById("dHours");
+    const elMins = document.getElementById("dMins");
+    const elSecs = document.getElementById("dSecs");
+
+    const lb = document.getElementById("lightbox");
+    const lbImg = document.getElementById("lbImg");
+    const lbClose = document.getElementById("lbClose");
+    const thumbs = Array.from(document.querySelectorAll(".thumb"));
+    const btnSlideshow = document.getElementById("btnSlideshow");
+    const toast = document.getElementById("toast");
+
+    let musicStarted = false;
+    let slideTimer = null;
+    let slideIndex = 0;
+    let toastTimer = null;
+
     function setRealViewportHeight() {
       const vh = window.innerHeight * 0.01;
       document.documentElement.style.setProperty("--vh", `${vh}px`);
     }
 
-    document.addEventListener("DOMContentLoaded", setRealViewportHeight);
-    window.addEventListener("resize", setRealViewportHeight);
+    function showToast(message) {
+      if (!toast) return;
+      toast.textContent = message;
+      toast.classList.add("show");
 
-    let musicStarted = false;
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove("show");
+      }, 2200);
+    }
 
     function removeMusicListeners() {
       document.removeEventListener("click", startMusicOnce);
@@ -983,99 +1050,35 @@
       removeMusicListeners();
     }
 
-    openBtn.addEventListener("click", () => {
-      startMusicOnce();
-      if (heroVideo) heroVideo.play().catch(() => {});
-      openingScreen.classList.add("is-leaving");
-      heroSection.classList.add("hero-reveal");
+    function unlockPageScroll() {
+      document.documentElement.classList.remove("scroll-lock");
+      document.body.classList.remove("scroll-lock");
+      setRealViewportHeight();
 
-      setTimeout(() => {
-        openingScreen.style.display = "none";
-        
-        // --- UNLOCKS THE SCROLLING ---
-        document.documentElement.classList.remove("scroll-lock");
-        document.body.classList.remove("scroll-lock");
-        
-        setRealViewportHeight();
-        // Trigger bubble calculation once layout stabilizes
-        const activeLink = document.querySelector('.dock a.active') || document.querySelector('.dock a');
-        moveBubble(activeLink);
-      }, 850);
-    });
+      const activeLink =
+        document.querySelector(".dock a.active") ||
+        document.querySelector(".dock a");
+      moveBubble(activeLink);
+    }
 
-    document.addEventListener("click", startMusicOnce, { passive: true });
-    document.addEventListener("touchstart", startMusicOnce, { passive: true });
+    function lockPageScroll() {
+      document.documentElement.classList.add("scroll-lock");
+      document.body.classList.add("scroll-lock");
+    }
 
-    /* --- SCROLL TRACKER --- */
-    const navDock = document.getElementById('navDock');
-    const dockBubble = document.getElementById('dockBubble');
-    const navLinks = document.querySelectorAll('.dock a');
-
-    // Helper function to animate the bubble smoothly to the active link
     function moveBubble(targetLink) {
       if (!targetLink || !dockBubble || !navDock) return;
-      
+
       const linkRect = targetLink.getBoundingClientRect();
       const dockRect = navDock.getBoundingClientRect();
-      
       const leftPos = linkRect.left - dockRect.left;
-      
+
       dockBubble.style.width = `${linkRect.width}px`;
       dockBubble.style.transform = `translateX(${leftPos}px)`;
-      
-      navLinks.forEach(link => link.classList.remove('active'));
-      targetLink.classList.add('active');
+
+      navLinks.forEach(link => link.classList.remove("active"));
+      targetLink.classList.add("active");
     }
-
-    // Set up modern scroll observer
-    if ('IntersectionObserver' in window) {
-      const sections = ['top', 'event', 'gallery', 'location'].map(id => document.getElementById(id));
-      
-      const observerOptions = {
-        root: null,
-        rootMargin: '-30% 0px -50% 0px', // Triggers when a section enters the main viewing area
-        threshold: 0
-      };
-
-      const scrollObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            const activeId = entry.target.id;
-            const targetLink = document.querySelector(`.dock a[href="#${activeId}"]`);
-            moveBubble(targetLink);
-          }
-        });
-      }, observerOptions);
-
-      sections.forEach(sec => {
-        if (sec) scrollObserver.observe(sec);
-      });
-    }
-
-    // Recalculate bubble if screen rotates or resizes
-    window.addEventListener('resize', () => {
-      const activeLink = document.querySelector('.dock a.active');
-      moveBubble(activeLink);
-    });
-
-    // Smooth scroll overriding
-    document.addEventListener("click", (e) => {
-      const a = e.target.closest('a[href^="#"]');
-      if (!a) return;
-
-      const target = document.querySelector(a.getAttribute("href"));
-      if (!target) return;
-
-      e.preventDefault();
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
-      moveBubble(a); // instantly move bubble on click
-    });
-    /* -------------------------------------- */
-
-    const elDays = document.getElementById("dDays");
-    const elHours = document.getElementById("dHours");
-    const elMins = document.getElementById("dMins");
-    const elSecs = document.getElementById("dSecs");
 
     function tickCountdown() {
       const now = new Date();
@@ -1084,9 +1087,9 @@
 
       if (diff <= 0) {
         elDays.textContent = "0";
-        elHours.textContent = "0";
-        elMins.textContent = "0";
-        elSecs.textContent = "0";
+        elHours.textContent = "00";
+        elMins.textContent = "00";
+        elSecs.textContent = "00";
         return;
       }
 
@@ -1102,9 +1105,6 @@
       elSecs.textContent = String(secs).padStart(2, "0");
     }
 
-    tickCountdown();
-    setInterval(tickCountdown, 1000);
-
     function toGoogleCalDate(iso) {
       const d = new Date(iso);
       const pad = (n) => String(n).padStart(2, "0");
@@ -1115,6 +1115,127 @@
         pad(d.getUTCMinutes()) +
         pad(d.getUTCSeconds()) + "Z";
     }
+
+    function stopSlideshow() {
+      if (!slideTimer) return;
+      clearInterval(slideTimer);
+      slideTimer = null;
+      btnSlideshow.textContent = "▶ Start slideshow";
+    }
+
+    function openLb(src) {
+      lbImg.src = src;
+      lb.hidden = false;
+      document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
+    }
+
+    function closeLb() {
+      lb.hidden = true;
+      lbImg.src = "";
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+      stopSlideshow();
+    }
+
+    function startSlideshow() {
+      if (slideTimer || thumbs.length === 0) return;
+
+      openLb(thumbs[slideIndex].dataset.full);
+
+      slideTimer = setInterval(() => {
+        slideIndex = (slideIndex + 1) % thumbs.length;
+        lbImg.src = thumbs[slideIndex].dataset.full;
+      }, 2200);
+
+      btnSlideshow.textContent = "⏸ Stop slideshow";
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      setRealViewportHeight();
+      tickCountdown();
+
+      const initialActive = document.querySelector(".dock a.active") || document.querySelector(".dock a");
+      moveBubble(initialActive);
+
+      if ("IntersectionObserver" in window) {
+        const sections = ["top", "event", "gallery", "location"]
+          .map(id => document.getElementById(id))
+          .filter(Boolean);
+
+        const scrollObserver = new IntersectionObserver((entries) => {
+          const visibleEntries = entries.filter(entry => entry.isIntersecting);
+          if (!visibleEntries.length) return;
+
+          visibleEntries.sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+          const activeId = visibleEntries[0].target.id;
+          const targetLink = document.querySelector(`.dock a[href="#${activeId}"]`);
+          moveBubble(targetLink);
+        }, {
+          root: null,
+          rootMargin: "-40% 0px -40% 0px",
+          threshold: [0.1, 0.25, 0.5, 0.75]
+        });
+
+        sections.forEach(sec => scrollObserver.observe(sec));
+
+        const galleryObserver = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) entry.target.classList.add("show");
+          });
+        }, { threshold: 0.15 });
+
+        thumbs.forEach((thumb) => galleryObserver.observe(thumb));
+      } else {
+        thumbs.forEach((thumb) => thumb.classList.add("show"));
+      }
+    });
+
+    window.addEventListener("resize", () => {
+      setRealViewportHeight();
+      const activeLink = document.querySelector(".dock a.active");
+      moveBubble(activeLink);
+    });
+
+    window.addEventListener("orientationchange", () => {
+      setTimeout(() => {
+        setRealViewportHeight();
+        const activeLink = document.querySelector(".dock a.active");
+        moveBubble(activeLink);
+      }, 200);
+    });
+
+    openBtn.addEventListener("click", () => {
+      startMusicOnce();
+      if (heroVideo) heroVideo.play().catch(() => {});
+      openingScreen.classList.add("is-leaving");
+      heroSection.classList.add("hero-reveal");
+    });
+
+    openingScreen.addEventListener("transitionend", (e) => {
+      if (e.propertyName !== "opacity") return;
+      if (!openingScreen.classList.contains("is-leaving")) return;
+
+      openingScreen.style.display = "none";
+      unlockPageScroll();
+    });
+
+    document.addEventListener("click", startMusicOnce, { passive: true });
+    document.addEventListener("touchstart", startMusicOnce, { passive: true });
+
+    document.addEventListener("click", (e) => {
+      const a = e.target.closest('a[href^="#"]');
+      if (!a) return;
+
+      const target = document.querySelector(a.getAttribute("href"));
+      if (!target) return;
+
+      e.preventDefault();
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+      moveBubble(a);
+    });
+
+    setInterval(tickCountdown, 1000);
 
     document.getElementById("btnCalendar").addEventListener("click", () => {
       const start = toGoogleCalDate(EVENT.startLocalISO);
@@ -1137,52 +1258,11 @@
     document.getElementById("btnCopyMap").addEventListener("click", async () => {
       try {
         await navigator.clipboard.writeText(EVENT.mapsUrl);
-        alert("Map link copied!");
+        showToast("Map link copied");
       } catch (e) {
-        prompt("Copy this link:", EVENT.mapsUrl);
+        window.prompt("Copy this link:", EVENT.mapsUrl);
       }
     });
-
-    const lb = document.getElementById("lightbox");
-    const lbImg = document.getElementById("lbImg");
-    const lbClose = document.getElementById("lbClose");
-    const thumbs = Array.from(document.querySelectorAll(".thumb"));
-    const btnSlideshow = document.getElementById("btnSlideshow");
-
-    let slideTimer = null;
-    let slideIndex = 0;
-
-    function openLb(src) {
-      lbImg.src = src;
-      lb.hidden = false;
-      document.body.style.overflow = "hidden";
-    }
-
-    function stopSlideshow() {
-      if (!slideTimer) return;
-      clearInterval(slideTimer);
-      slideTimer = null;
-      btnSlideshow.textContent = "▶ Start slideshow";
-    }
-
-    function closeLb() {
-      lb.hidden = true;
-      lbImg.src = "";
-      document.body.style.overflow = "";
-      stopSlideshow();
-    }
-
-    function startSlideshow() {
-      if (slideTimer || thumbs.length === 0) return;
-      openLb(thumbs[slideIndex].dataset.full);
-
-      slideTimer = setInterval(() => {
-        slideIndex = (slideIndex + 1) % thumbs.length;
-        lbImg.src = thumbs[slideIndex].dataset.full;
-      }, 2200);
-
-      btnSlideshow.textContent = "⏸ Stop slideshow";
-    }
 
     lbClose.addEventListener("click", closeLb);
 
@@ -1190,28 +1270,31 @@
       if (e.target === lb) closeLb();
     });
 
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !lb.hidden) {
+        closeLb();
+      }
+    });
+
     thumbs.forEach((btn) => {
       btn.addEventListener("click", () => {
+        stopSlideshow();
         slideIndex = thumbs.indexOf(btn);
         openLb(btn.dataset.full);
       });
     });
 
-    if ("IntersectionObserver" in window) {
-      const io = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) entry.target.classList.add("show");
-        });
-      }, { threshold: 0.15 });
-
-      thumbs.forEach((thumb) => io.observe(thumb));
-    } else {
-      thumbs.forEach((thumb) => thumb.classList.add("show"));
-    }
-
     btnSlideshow.addEventListener("click", () => {
       if (slideTimer) stopSlideshow();
       else startSlideshow();
+    });
+
+    audio.addEventListener("error", () => {
+      console.warn("music.mp3 could not be loaded.");
+    });
+
+    heroVideo?.addEventListener("error", () => {
+      console.warn("hero.mp4 could not be loaded.");
     });
   </script>
 </body>
