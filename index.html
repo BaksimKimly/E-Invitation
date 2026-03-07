@@ -16,17 +16,32 @@
     a{ color:inherit; text-decoration:none; }
     button{ font:inherit; border:none; outline:none; }
 
-    .bg-wrap{ position:fixed; inset:0; z-index:0; overflow:hidden; background:#050505; }
+    /* The Main Phone Container for the Background */
+    .bg-wrap{ 
+      position:fixed; 
+      inset:0; 
+      margin: 0 auto; /* Centers the background on desktop */
+      width: 100%; 
+      max-width: 500px; /* Locks to phone size */
+      z-index:0; 
+      overflow:hidden; 
+      background:#050505; 
+      border-left: 1px solid rgba(255,255,255,0.03); /* Subtle edge */
+      border-right: 1px solid rgba(255,255,255,0.03);
+      box-shadow: 0 0 40px rgba(0,0,0,0.6); /* Creates separation from desktop background */
+    }
     .bg-video{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:1; filter:brightness(.92) contrast(1.08) saturate(1.12); opacity:1; transition:opacity .5s ease; }
     .fallback-bg{ position:absolute; inset:0; z-index:0; background: radial-gradient(900px 650px at 50% 26%, rgba(255,221,160,.20), transparent 60%), radial-gradient(800px 520px at 12% 86%, rgba(255,190,90,.12), transparent 58%), radial-gradient(900px 650px at 86% 88%, rgba(255,225,170,.12), transparent 58%), linear-gradient(180deg, #0b0b0b, #040404); }
     .overlay{ position:absolute; inset:0; z-index:2; background: radial-gradient(55% 45% at 50% 28%, rgba(255,220,150,.22), transparent 60%), radial-gradient(90% 80% at 50% 35%, rgba(0,0,0,.10), rgba(0,0,0,.72)); }
 
     #openingScreen, .hero, .section, .dock, .lightbox{ position:relative; z-index:3; }
 
+    /* The Scrollable Content also locked to phone size */
     #fitViewport{ position:relative; width: 100%; max-width: 500px; min-height:100svh; display:flex; flex-direction: column; align-items:center; padding:0; z-index:3; margin: 0 auto; }
     #fitRoot{ position:relative; width: 100%; display: flex; flex-direction: column; align-items: center; }
 
-    #openingScreen{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; z-index:9999; opacity:1; overflow:hidden; background:transparent; min-height:calc(var(--vh) * 100); padding:20px; transition: opacity .85s ease, transform .85s ease, visibility .85s ease; }
+    /* Opening Envelope locked to phone size */
+    #openingScreen{ position:fixed; inset:0; margin:0 auto; width:100%; max-width:500px; display:flex; align-items:center; justify-content:center; z-index:9999; opacity:1; overflow:hidden; background:transparent; min-height:calc(var(--vh) * 100); padding:20px; transition: opacity .85s ease, transform .85s ease, visibility .85s ease; }
     #openingScreen.is-leaving{ opacity:0; transform:scale(1.02); visibility:hidden; pointer-events:none; }
     .opening-glass{ position:absolute; inset:0; backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); background:rgba(0,0,0,.14); }
     .opening-overlay{ position:absolute; inset:0; background: radial-gradient(70% 60% at 50% 30%, rgba(255,220,150,.05), rgba(0,0,0,.26)); pointer-events:none; }
@@ -73,7 +88,6 @@
     .qrbox img{ width:100%; height:100%; object-fit:cover; }
     .qrtext{ text-align:center; color:rgba(255,255,255,.78); font-size:clamp(14px, 4vw, 16px); }
 
-    /* Cursive Hero Title with Added Word Spacing */
     .hero-title{ margin:0 0 16px; font-family:"Great Vibes", cursive; font-size:clamp(36px, 8vw, 48px); font-weight:500; color:rgba(255,245,210,.92); word-spacing: 0.4em; }
 
     .parents{ display:flex; justify-content: space-between; gap: 10px; width: 100%; margin: 0 auto 16px; }
@@ -100,8 +114,8 @@
     @keyframes heroReveal{ 0%{ opacity:0; filter:blur(8px); } 100%{ opacity:1; filter:blur(0); } }
     @keyframes heroCardRise{ 0%{ opacity:0; transform:translateY(24px) scale(.98); } 100%{ opacity:1; transform:translateY(0) scale(1); } }
 
-    /* Lightbox */
-    .lightbox{ position:fixed; inset:0; background:rgba(0,0,0,.92); display:flex; align-items:center; justify-content:center; z-index:10000; padding:20px; }
+    /* Lightbox locked to phone size */
+    .lightbox{ position:fixed; inset:0; margin:0 auto; width:100%; max-width:500px; background:rgba(0,0,0,.92); display:flex; align-items:center; justify-content:center; z-index:10000; padding:20px; }
     .lightbox[hidden]{ display:none; }
     .lightbox img{ width:100%; max-width: 500px; max-height:88vh; object-fit:contain; }
     .lb-close{ position:absolute; top:20px; right:20px; width:44px; height:44px; border-radius:999px; background:rgba(255,255,255,.1); border:1px solid rgba(255,215,150,.3); color:white; font-size:26px; cursor:pointer; }
