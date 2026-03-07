@@ -415,14 +415,69 @@
       text-transform:uppercase;
     }
 
-    .grid{
+    .gallery-wrap{
+      position:relative;
+      width:100%;
       margin-top:20px;
+    }
+
+    .gallery-wrap::before,
+    .gallery-wrap::after{
+      content:"";
+      position:absolute;
+      left:0;
+      right:4px;
+      height:28px;
+      z-index:3;
+      pointer-events:none;
+    }
+
+    .gallery-wrap::before{
+      top:0;
+      background:linear-gradient(to bottom, rgba(0,0,0,.42), transparent);
+      border-top-left-radius:14px;
+      border-top-right-radius:14px;
+    }
+
+    .gallery-wrap::after{
+      bottom:0;
+      background:linear-gradient(to top, rgba(0,0,0,.42), transparent);
+      border-bottom-left-radius:14px;
+      border-bottom-right-radius:14px;
+    }
+
+    .grid{
+      margin-top:0;
       display:grid;
       grid-template-columns:repeat(2, 1fr);
       grid-auto-rows:140px;
       grid-auto-flow:dense;
       gap:10px;
       width:100%;
+      max-height:min(65vh, 560px);
+      overflow-y:auto;
+      overflow-x:hidden;
+      padding-right:4px;
+      scrollbar-width:thin;
+      scrollbar-color:rgba(207,163,79,.45) rgba(255,255,255,.06);
+    }
+
+    .grid::-webkit-scrollbar{
+      width:8px;
+    }
+
+    .grid::-webkit-scrollbar-track{
+      background:rgba(255,255,255,.06);
+      border-radius:999px;
+    }
+
+    .grid::-webkit-scrollbar-thumb{
+      background:rgba(207,163,79,.45);
+      border-radius:999px;
+    }
+
+    .grid::-webkit-scrollbar-thumb:hover{
+      background:rgba(207,163,79,.65);
     }
 
     .thumb{
@@ -640,12 +695,25 @@
       line-height:1.1;
       font-weight:500;
       font-family:"Great Vibes", cursive;
-      background:linear-gradient(90deg, var(--gold-1) 0%, var(--gold-2) 18%, var(--gold-3) 35%, var(--gold-4) 50%, var(--gold-3) 65%, var(--gold-2) 82%, var(--gold-1) 100%);
+      background:linear-gradient(
+        90deg,
+        var(--gold-1) 0%,
+        var(--gold-2) 18%,
+        var(--gold-3) 35%,
+        var(--gold-4) 50%,
+        var(--gold-3) 65%,
+        var(--gold-2) 82%,
+        var(--gold-1) 100%
+      );
       background-size:240% 100%;
       -webkit-background-clip:text;
       background-clip:text;
       color:transparent;
       white-space:nowrap;
+      animation:goldShift 4.5s ease-in-out infinite;
+      text-shadow:
+        0 0 8px rgba(255,220,150,.10),
+        0 0 16px rgba(207,163,79,.08);
     }
 
     .hero-monogram{
@@ -702,34 +770,6 @@
       box-shadow:0 12px 35px rgba(0,0,0,.45);
     }
 
-    .toast{
-      position:fixed;
-      left:50%;
-      bottom:calc(max(15px, env(safe-area-inset-bottom)) + 82px);
-      transform:translateX(-50%) translateY(12px);
-      width:max-content;
-      max-width:min(90vw, 360px);
-      padding:12px 16px;
-      border-radius:12px;
-      border:1px solid rgba(255,215,150,.22);
-      background:rgba(20,16,12,.78);
-      color:rgba(255,255,255,.92);
-      box-shadow:0 10px 30px rgba(0,0,0,.38);
-      backdrop-filter:blur(12px);
-      -webkit-backdrop-filter:blur(12px);
-      z-index:11000;
-      opacity:0;
-      pointer-events:none;
-      transition:opacity .25s ease, transform .25s ease;
-      text-align:center;
-      font-size:14px;
-    }
-
-    .toast.show{
-      opacity:1;
-      transform:translateX(-50%) translateY(0);
-    }
-
     @keyframes goldShift{
       0%{ background-position:0% 50%; }
       50%{ background-position:100% 50%; }
@@ -773,10 +813,16 @@
       justify-content:center;
       z-index:10000;
       padding:20px;
+      opacity:0;
+      visibility:hidden;
+      pointer-events:none;
+      transition:opacity .35s ease, visibility .35s ease;
     }
 
-    .lightbox[hidden]{
-      display:none;
+    .lightbox.is-open{
+      opacity:1;
+      visibility:visible;
+      pointer-events:auto;
     }
 
     .lightbox img{
@@ -784,6 +830,14 @@
       max-width:500px;
       max-height:88vh;
       object-fit:contain;
+      opacity:0;
+      transform:scale(.985);
+      transition:opacity .35s ease, transform .35s ease;
+    }
+
+    .lightbox.is-open img{
+      opacity:1;
+      transform:scale(1);
     }
 
     .lb-close{
@@ -798,6 +852,14 @@
       color:white;
       font-size:26px;
       cursor:pointer;
+      opacity:0;
+      transform:translateY(-6px);
+      transition:opacity .3s ease, transform .3s ease;
+    }
+
+    .lightbox.is-open .lb-close{
+      opacity:1;
+      transform:translateY(0);
     }
 
     @media (prefers-reduced-motion: reduce){
@@ -841,12 +903,10 @@
     <a href="#location">Location</a>
   </nav>
 
-  <div class="lightbox" id="lightbox" hidden>
+  <div class="lightbox" id="lightbox" aria-hidden="true">
     <button class="lb-close" id="lbClose" aria-label="Close">×</button>
     <img id="lbImg" alt="Full image" />
   </div>
-
-  <div class="toast" id="toast"></div>
 
   <div id="fitViewport">
     <div id="fitRoot">
@@ -920,24 +980,40 @@
         <div class="content">
           <h2 class="section-title">Photo Gallery</h2>
 
-          <div class="grid" id="galleryGrid">
-            <button class="thumb" data-full="01.jpg"><img src="01.jpg" alt="Photo 1" loading="lazy"></button>
-            <button class="thumb" data-full="02.jpg"><img src="02.jpg" alt="Photo 2" loading="lazy"></button>
-            <button class="thumb" data-full="03.jpg"><img src="03.jpg" alt="Photo 3" loading="lazy"></button>
-            <button class="thumb" data-full="04.jpg"><img src="04.jpg" alt="Photo 4" loading="lazy"></button>
-            <button class="thumb" data-full="02.jpg"><img src="02.jpg" alt="Photo 5" loading="lazy"></button>
-            <button class="thumb" data-full="01.jpg"><img src="01.jpg" alt="Photo 6" loading="lazy"></button>
-
-            <button class="thumb" data-full="04.jpg"><img src="04.jpg" alt="Photo 7" loading="lazy"></button>
-            <button class="thumb" data-full="03.jpg"><img src="03.jpg" alt="Photo 8" loading="lazy"></button>
-            <button class="thumb" data-full="01.jpg"><img src="01.jpg" alt="Photo 9" loading="lazy"></button>
-            <button class="thumb" data-full="02.jpg"><img src="02.jpg" alt="Photo 10" loading="lazy"></button>
-            <button class="thumb" data-full="04.jpg"><img src="04.jpg" alt="Photo 11" loading="lazy"></button>
-            <button class="thumb" data-full="03.jpg"><img src="03.jpg" alt="Photo 12" loading="lazy"></button>
+          <div class="gallery-wrap">
+            <div class="grid" id="galleryGrid">
+              <button class="thumb" data-full="01.jpg"><img src="01.jpg" alt="Photo 1" loading="lazy"></button>
+              <button class="thumb" data-full="02.jpg"><img src="02.jpg" alt="Photo 2" loading="lazy"></button>
+              <button class="thumb" data-full="03.jpg"><img src="03.jpg" alt="Photo 3" loading="lazy"></button>
+              <button class="thumb" data-full="04.jpg"><img src="04.jpg" alt="Photo 4" loading="lazy"></button>
+              <button class="thumb" data-full="05.jpg"><img src="05.jpg" alt="Photo 5" loading="lazy"></button>
+              <button class="thumb" data-full="06.jpg"><img src="06.jpg" alt="Photo 6" loading="lazy"></button>
+              <button class="thumb" data-full="07.jpg"><img src="07.jpg" alt="Photo 7" loading="lazy"></button>
+              <button class="thumb" data-full="08.jpg"><img src="08.jpg" alt="Photo 8" loading="lazy"></button>
+              <button class="thumb" data-full="09.jpg"><img src="09.jpg" alt="Photo 9" loading="lazy"></button>
+              <button class="thumb" data-full="10.jpg"><img src="10.jpg" alt="Photo 10" loading="lazy"></button>
+              <button class="thumb" data-full="11.jpg"><img src="11.jpg" alt="Photo 11" loading="lazy"></button>
+              <button class="thumb" data-full="12.jpg"><img src="12.jpg" alt="Photo 12" loading="lazy"></button>
+              <button class="thumb" data-full="13.jpg"><img src="13.jpg" alt="Photo 13" loading="lazy"></button>
+              <button class="thumb" data-full="14.jpg"><img src="14.jpg" alt="Photo 14" loading="lazy"></button>
+              <button class="thumb" data-full="15.jpg"><img src="15.jpg" alt="Photo 15" loading="lazy"></button>
+              <button class="thumb" data-full="16.jpg"><img src="16.jpg" alt="Photo 16" loading="lazy"></button>
+              <button class="thumb" data-full="17.jpg"><img src="17.jpg" alt="Photo 17" loading="lazy"></button>
+              <button class="thumb" data-full="18.jpg"><img src="18.jpg" alt="Photo 18" loading="lazy"></button>
+              <button class="thumb" data-full="19.jpg"><img src="19.jpg" alt="Photo 19" loading="lazy"></button>
+              <button class="thumb" data-full="20.jpg"><img src="20.jpg" alt="Photo 20" loading="lazy"></button>
+              <button class="thumb" data-full="21.jpg"><img src="21.jpg" alt="Photo 21" loading="lazy"></button>
+              <button class="thumb" data-full="22.jpg"><img src="22.jpg" alt="Photo 22" loading="lazy"></button>
+              <button class="thumb" data-full="23.jpg"><img src="23.jpg" alt="Photo 23" loading="lazy"></button>
+              <button class="thumb" data-full="24.jpg"><img src="24.jpg" alt="Photo 24" loading="lazy"></button>
+              <button class="thumb" data-full="25.jpg"><img src="25.jpg" alt="Photo 25" loading="lazy"></button>
+              <button class="thumb" data-full="26.jpg"><img src="26.jpg" alt="Photo 26" loading="lazy"></button>
+              <button class="thumb" data-full="27.jpg"><img src="27.jpg" alt="Photo 27" loading="lazy"></button>
+              <button class="thumb" data-full="28.jpg"><img src="28.jpg" alt="Photo 28" loading="lazy"></button>
+              <button class="thumb" data-full="29.jpg"><img src="29.jpg" alt="Photo 29" loading="lazy"></button>
+              <button class="thumb" data-full="30.jpg"><img src="30.jpg" alt="Photo 30" loading="lazy"></button>
+            </div>
           </div>
-
-          <div class="divider"></div>
-          <button class="btn" id="btnSlideshow" type="button">▶ Start slideshow</button>
         </div>
       </section>
 
@@ -948,11 +1024,6 @@
             <strong>The Premier Center Sensok (Building D&amp;E)</strong><br>
             Phnom Penh, Cambodia
           </p>
-
-          <div class="pillrow">
-            <button class="pill" id="btnMaps" type="button">Open in Google Maps</button>
-            <button class="pill" id="btnCopyMap" type="button">Copy Map Link</button>
-          </div>
 
           <div class="qrwrap">
             <div class="qrbox">
@@ -991,8 +1062,7 @@
       details: "Request the honor of your presence on the auspicious occasion of the wedding reception.",
       locationName: "The Premier Center Sensok (Building D&E), Phnom Penh, Cambodia",
       startLocalISO: "2026-03-29T17:00:00+07:00",
-      endLocalISO: "2026-03-29T19:00:00+07:00",
-      mapsUrl: "https://google.com/maps?rlz=1C1GCEU_enKH1181KH1181&gs_lcrp=EgZjaHJvbWUqCggAEAAY4wIYgAQyCggAEAAY4wIYgAQyDQgBEC4YrwEYxwEYgAQyBwgCEAAYgAQyBggDEEUYOTINCAQQLhivARjHARiABDIHCAUQLhiABDIHCAYQABiABDIHCAcQABiABDIHCAgQABiABDINCAkQLhivARjHARiABNIBCDMxNzBqMGo3qAIAsAIA&um=1&ie=UTF-8&fb=1&gl=kh&sa=X&geocode=KdGLHwrFUwkxMRKdi4cIgAHj&daddr=JV2M%2B35M,+Phnom+Penh"
+      endLocalISO: "2026-03-29T19:00:00+07:00"
     };
 
     const heroVideo = document.getElementById("heroVideo");
@@ -1014,28 +1084,12 @@
     const lbImg = document.getElementById("lbImg");
     const lbClose = document.getElementById("lbClose");
     const thumbs = Array.from(document.querySelectorAll(".thumb"));
-    const btnSlideshow = document.getElementById("btnSlideshow");
-    const toast = document.getElementById("toast");
 
     let musicStarted = false;
-    let slideTimer = null;
-    let slideIndex = 0;
-    let toastTimer = null;
 
     function setRealViewportHeight() {
       const vh = window.innerHeight * 0.01;
       document.documentElement.style.setProperty("--vh", `${vh}px`);
-    }
-
-    function showToast(message) {
-      if (!toast) return;
-      toast.textContent = message;
-      toast.classList.add("show");
-
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => {
-        toast.classList.remove("show");
-      }, 2200);
     }
 
     function removeMusicListeners() {
@@ -1059,11 +1113,6 @@
         document.querySelector(".dock a.active") ||
         document.querySelector(".dock a");
       moveBubble(activeLink);
-    }
-
-    function lockPageScroll() {
-      document.documentElement.classList.add("scroll-lock");
-      document.body.classList.add("scroll-lock");
     }
 
     function moveBubble(targetLink) {
@@ -1116,39 +1165,28 @@
         pad(d.getUTCSeconds()) + "Z";
     }
 
-    function stopSlideshow() {
-      if (!slideTimer) return;
-      clearInterval(slideTimer);
-      slideTimer = null;
-      btnSlideshow.textContent = "▶ Start slideshow";
-    }
-
     function openLb(src) {
+      lbImg.style.opacity = "0";
+      lbImg.style.transform = "scale(.985)";
       lbImg.src = src;
-      lb.hidden = false;
+
+      lb.classList.add("is-open");
+      lb.setAttribute("aria-hidden", "false");
       document.body.style.overflow = "hidden";
       document.documentElement.style.overflow = "hidden";
     }
 
     function closeLb() {
-      lb.hidden = true;
-      lbImg.src = "";
+      lb.classList.remove("is-open");
+      lb.setAttribute("aria-hidden", "true");
       document.body.style.overflow = "";
       document.documentElement.style.overflow = "";
-      stopSlideshow();
-    }
 
-    function startSlideshow() {
-      if (slideTimer || thumbs.length === 0) return;
-
-      openLb(thumbs[slideIndex].dataset.full);
-
-      slideTimer = setInterval(() => {
-        slideIndex = (slideIndex + 1) % thumbs.length;
-        lbImg.src = thumbs[slideIndex].dataset.full;
-      }, 2200);
-
-      btnSlideshow.textContent = "⏸ Stop slideshow";
+      setTimeout(() => {
+        if (!lb.classList.contains("is-open")) {
+          lbImg.src = "";
+        }
+      }, 350);
     }
 
     document.addEventListener("DOMContentLoaded", () => {
@@ -1251,19 +1289,6 @@
       window.open(url.toString(), "_blank", "noopener");
     });
 
-    document.getElementById("btnMaps").addEventListener("click", () => {
-      window.open(EVENT.mapsUrl, "_blank", "noopener");
-    });
-
-    document.getElementById("btnCopyMap").addEventListener("click", async () => {
-      try {
-        await navigator.clipboard.writeText(EVENT.mapsUrl);
-        showToast("Map link copied");
-      } catch (e) {
-        window.prompt("Copy this link:", EVENT.mapsUrl);
-      }
-    });
-
     lbClose.addEventListener("click", closeLb);
 
     lb.addEventListener("click", (e) => {
@@ -1271,22 +1296,22 @@
     });
 
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && !lb.hidden) {
+      if (e.key === "Escape" && lb.classList.contains("is-open")) {
         closeLb();
       }
     });
 
-    thumbs.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        stopSlideshow();
-        slideIndex = thumbs.indexOf(btn);
-        openLb(btn.dataset.full);
+    lbImg.addEventListener("load", () => {
+      requestAnimationFrame(() => {
+        lbImg.style.opacity = "1";
+        lbImg.style.transform = "scale(1)";
       });
     });
 
-    btnSlideshow.addEventListener("click", () => {
-      if (slideTimer) stopSlideshow();
-      else startSlideshow();
+    thumbs.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        openLb(btn.dataset.full);
+      });
     });
 
     audio.addEventListener("error", () => {
