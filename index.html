@@ -38,7 +38,7 @@
       scroll-behavior:smooth;
       -webkit-text-size-adjust:100%;
       width:100vw;
-      min-height:100svh; /* Fixed scrolling bug */
+      min-height:100svh;
     }
 
     .bg-wrap{
@@ -434,11 +434,11 @@
       transition:transform .25s ease;
     }
 
-    /* TOP DOCK NAVIGATION */
+    /* BOTTOM DOCK NAVIGATION */
     .dock{
       position:fixed;
       left:50%;
-      top:max(15px, env(safe-area-inset-top)); 
+      bottom:max(15px, env(safe-area-inset-bottom)); /* Moved to bottom */
       transform:translateX(-50%);
       display:flex;
       gap:4px;
