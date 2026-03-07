@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="format-detection" content="telephone=no, date=no, address=no, email=no">
   <title>Baksim & Kimly • Invitation</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -39,6 +40,10 @@
     /* The Scrollable Content also locked to phone size */
     #fitViewport{ position:relative; width: 100%; max-width: 500px; min-height:100svh; display:flex; flex-direction: column; align-items:center; padding:0; z-index:3; margin: 0 auto; }
     #fitRoot{ position:relative; width: 100%; display: flex; flex-direction: column; align-items: center; }
+
+    /* Forcing all links to never have underlines */
+    a, a:link, a:visited, a:hover, a:active { color:inherit; text-decoration:none !important; outline:none; }
+    button{ font:inherit; border:none; outline:none; }
 
     /* Opening Envelope locked to phone size */
     #openingScreen{ position:fixed; inset:0; margin:0 auto; width:100%; max-width:500px; display:flex; align-items:center; justify-content:center; z-index:9999; opacity:1; overflow:hidden; background:transparent; min-height:calc(var(--vh) * 100); padding:20px; transition: opacity .85s ease, visibility .85s ease; }
@@ -96,12 +101,14 @@
 
     .invite-copy{ margin:12px auto 0; width: 95%; color:rgba(255,242,220,.86); font-size:clamp(12px, 3.5vw, 16px); line-height:1.5; text-transform:uppercase; }
 
-    /* LOCKED INTO ONE ROW */
+    /* COUPLE NAMES - Enlarged but protected from clipping/wrapping */
     .couple-wrap { display: flex; align-items: center; justify-content: center; flex-wrap: nowrap; gap: 4px; margin: 20px auto 10px; width: 100%; }
     .couple-side { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; }
     .couple-role { margin: 0 0 2px; font-size: clamp(11px, 2.5vw, 14px); letter-spacing: .1em; text-transform: uppercase; color: rgba(255,228,170,.85); }
-    .couple-name { margin: 0; font-size: clamp(20px, 6vw, 28px); line-height: 1.1; font-weight: 500; font-family: "Great Vibes", cursive; background: linear-gradient(90deg, var(--gold-1) 0%, var(--gold-2) 18%, var(--gold-3) 35%, var(--gold-4) 50%, var(--gold-3) 65%, var(--gold-2) 82%, var(--gold-1) 100%); background-size: 240% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; white-space: nowrap; }
-    .hero-monogram { width: clamp(36px, 10vw, 60px); height: auto; display: block; flex-shrink: 0; filter: drop-shadow(0 10px 24px rgba(0,0,0,.34)); margin: 0 2px; }
+    /* Made maximum size 40px, but it dynamically shrinks down strictly on tiny screens */
+    .couple-name { margin: 0; font-size: clamp(24px, 8vw, 40px); line-height: 1.1; font-weight: 500; font-family: "Great Vibes", cursive; background: linear-gradient(90deg, var(--gold-1) 0%, var(--gold-2) 18%, var(--gold-3) 35%, var(--gold-4) 50%, var(--gold-3) 65%, var(--gold-2) 82%, var(--gold-1) 100%); background-size: 240% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; white-space: nowrap; }
+    /* Slightly scaled down middle monogram to give the large text breathing room */
+    .hero-monogram { width: clamp(32px, 8vw, 56px); height: auto; display: block; flex-shrink: 0; filter: drop-shadow(0 10px 24px rgba(0,0,0,.34)); margin: 0 2px; }
 
     .held-line{ margin:18px 0 6px; font-size:clamp(12px, 3.5vw, 16px); line-height:1.3; text-transform:uppercase; color:rgba(255,242,220,.82); }
     .date-row{ margin:0; font-size:clamp(14px, 4vw, 22px); line-height:1.3; font-weight:600; text-transform:uppercase; color:rgba(255,245,220,.96); white-space: nowrap; }
