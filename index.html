@@ -41,6 +41,12 @@
       min-height:100svh;
     }
 
+    /* Scroll Lock Class for the Intro Screen */
+    body.scroll-lock {
+      overflow: hidden;
+      touch-action: none; /* Prevents mobile swiping */
+    }
+
     .bg-wrap{
       position:fixed;
       top:0;
@@ -189,8 +195,7 @@
 
     .open-sub{
       font-family:"Great Vibes", cursive;
-      /* Made the text smaller here */
-      font-size:clamp(24px, 6vw, 34px);
+      font-size:clamp(24px, 6vw, 34px); /* Slightly smaller text */
       line-height:1.1;
       letter-spacing:.02em;
       margin:0;
@@ -205,11 +210,10 @@
     .open-logo-wrap{
       position:relative;
       display:inline-block;
-      /* Made the logo bigger while keeping margin the same */
       width:100%;
-      max-width:380px; 
+      max-width:380px; /* Bigger logo max-width */
       line-height:0;
-      margin:35px 0; 
+      margin:35px 0; /* Same exact spacing */
       animation:logoFloat 3.8s ease-in-out infinite;
     }
 
@@ -447,7 +451,6 @@
       padding: 6px; 
       border-radius: 999px;
       
-      /* Dark elegant glass matched to your dark gold background */
       background: rgba(20, 16, 12, 0.55); 
       border: 1px solid rgba(255, 215, 150, 0.2); 
       backdrop-filter: blur(20px) saturate(150%);
@@ -468,7 +471,6 @@
       bottom: 6px;
       left: 0;
       width: 0;
-      /* Almost transparent with a golden sheen */
       background: linear-gradient(135deg, rgba(207, 163, 79, 0.25), rgba(207, 163, 79, 0.05)); 
       border: 1px solid rgba(207, 163, 79, 0.5); 
       border-radius: 999px;
@@ -484,7 +486,7 @@
       text-align: center;
       padding: 8px 4px;
       border-radius: 999px;
-      color: rgba(255, 255, 255, 0.65); /* Soft white for inactive */
+      color: rgba(255, 255, 255, 0.65);
       font-size: clamp(10px, 3vw, 13px);
       white-space: nowrap;
       position: relative;
@@ -493,12 +495,11 @@
     }
 
     .dock a.active {
-      color: #ffffff; /* Bright white inside the gold bubble */
+      color: #ffffff; 
       font-weight: 700;
       transform: scale(1.05); 
       text-shadow: 0 2px 5px rgba(0,0,0,0.6); 
     }
-    /* -------------------------------------- */
 
     .qrwrap{
       display:flex;
@@ -740,7 +741,7 @@
     }
   </style>
 </head>
-<body>
+<body class="scroll-lock">
 
   <div class="bg-wrap" aria-hidden="true">
     <div class="fallback-bg"></div>
@@ -951,7 +952,10 @@
 
       setTimeout(() => {
         openingScreen.style.display = "none";
-        document.body.style.overflow = "";
+        
+        // UNLOCKS THE SCROLL ONCE BUTTON IS CLICKED
+        document.body.classList.remove("scroll-lock");
+        
         setRealViewportHeight();
         // Trigger bubble calculation once layout stabilizes
         const activeLink = document.querySelector('.dock a.active') || document.querySelector('.dock a');
