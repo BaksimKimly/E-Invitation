@@ -325,10 +325,15 @@
     }
 
     #gallery.section,
-    #location.section,
-    #wishes.section{
+    #location.section {
       padding-top:20px;
       padding-bottom:20px;
+    }
+
+    /* --- ADDED EXTRA PADDING TO PREVENT DOCK OVERLAP --- */
+    #wishes.section {
+      padding-top:20px;
+      padding-bottom: max(120px, calc(env(safe-area-inset-bottom) + 90px));
     }
 
     #gallery .content,
