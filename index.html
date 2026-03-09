@@ -446,7 +446,8 @@
     <source src="music.mp3" type="audio/mpeg" />
   </audio>
 
-<script>
+
+  <script>
 document.addEventListener('DOMContentLoaded', function() {
   const EVENT = { 
     title: "The Wedding of Tan Baksim & Try Kimly", 
@@ -498,7 +499,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.scrollTo(0, scrollY);
   }
   
-  // === LIGHTBOX FUNCTIONS ===
+  // === FIXED ANIMATION DIRECTION ===
   function preloadNextImage() {
     const nextIdx = (lbCurrentIndex + 1) % thumbImages.length;
     const prevIdx = (lbCurrentIndex - 1 + thumbImages.length) % thumbImages.length;
@@ -514,16 +515,27 @@ document.addEventListener('DOMContentLoaded', function() {
     preloadNextImage();
   }
   
+  // ✅ FIXED: Click RIGHT = Image slides RIGHT → New image from LEFT
+  // ✅ FIXED: Click LEFT = Image slides LEFT → New image from RIGHT  
   function slideToNext(direction) {
     const nextIndex = direction === 'next' ? 
       (lbCurrentIndex + 1) % thumbImages.length : 
       (lbCurrentIndex - 1 + thumbImages.length) % thumbImages.length;
     
+    // Slide CURRENT image OUT in direction of swipe
     lbImg.style.transition = 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)';
+    
+    if (direction === 'next') {
+      // Right swipe: current image moves RIGHT
+      lbImg.style.transform = 'translateX(100%)';
+    } else {
+      // Left swipe: current image moves LEFT  
+      lbImg.style.transform = 'translateX(-100%)';
+    }
     lbImg.style.opacity = '0';
-    lbImg.style.transform = direction === 'next' ? 'translateX(-100%)' : 'translateX(100%)';
     
     setTimeout(() => {
+      // New image slides IN from opposite direction
       lbCurrentIndex = nextIndex;
       lbImg.src = thumbImages[nextIndex];
     }, 125);
@@ -546,16 +558,18 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!isDragging || !lb.classList.contains('is-open')) return;
     e.preventDefault();
     const currentX = e.touches[0].clientX;
-    const diff = currentX - startX;
-    lbImg.style.transform = `translateX(${diff}px)`;
+    const diff = currentX - startX;  // Positive = finger RIGHT
+    lbImg.style.transform = `translateX(${diff}px)`;  // Image follows finger
   }, { passive: false });
   
   lb.addEventListener('touchend', e => {
     if (!isDragging) return;
     isDragging = false;
     const endX = e.changedTouches[0].clientX;
-    const diff = endX - startX;
+    const diff = endX - startX;  // Positive = swiped RIGHT
+    
     if (Math.abs(diff) > 80) {
+      // Swiped RIGHT → NEXT image
       slideToNext(diff > 0 ? 'next' : 'prev');
     } else {
       lbImg.style.transition = 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)';
@@ -563,18 +577,19 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }, { passive: false });
   
-  // === CLICK HANDLING - MIDDLE DOES NOTHING ===
+  // === CLICK HANDLING ===
   lbImg.addEventListener('click', function(e) {
     e.stopPropagation();
     const rect = lbImg.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width;
+    
+    // Left side → PREV, Right side → NEXT
     if (x < 0.3) slideToNext('prev');
     else if (x > 0.7) slideToNext('next');
-    // Middle 40% = NOTHING ✅
   });
   
   lb.addEventListener('click', function(e) {
-    if (e.target === lb) closeLb(); // Only background closes
+    if (e.target === lb) closeLb();
   });
   
   lbImg.onload = () => {
@@ -680,8 +695,10 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 
+
 </body>
 </html>
 when I scrolled side to side, scrolled/swip right it goes left it goes the opposite.
 And I cant use the click on the far right or left functinon on the img to go to other img
+
 
