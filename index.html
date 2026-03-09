@@ -73,6 +73,14 @@
     #openingScreen{ position:fixed; inset:0; margin:0 auto; width:100%; max-width:500px; display:flex; align-items:center; justify-content:center; z-index:9999; opacity:1; overflow:hidden; background:transparent; min-height:calc(var(--vh) * 100); padding:20px 10px; transition:opacity .85s ease, visibility .85s ease; visibility:visible; }
 
     #openingScreen.is-leaving{ opacity:0; visibility:hidden; pointer-events:none; }
+    #openingScreen { 
+        padding-top: clamp(12px, 2.5vh, 18px) !important;  /* Tiny top padding */
+      }
+      
+      .open-sub { 
+        margin-top: 0.5rem !important;  /* Just enough for "Wedding Invitation" text */
+      }
+
 
     .opening-glass{ position:absolute; inset:0; backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); background:rgba(0,0,0,.14); }
 
@@ -712,6 +720,7 @@ lb.addEventListener('touchend', e => {
 </html>
 when I scrolled side to side, scrolled/swip right it goes left it goes the opposite.
 And I cant use the click on the far right or left functinon on the img to go to other img
+
 
 
 
