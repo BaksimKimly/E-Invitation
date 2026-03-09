@@ -330,7 +330,6 @@
       padding-bottom:20px;
     }
 
-    /* --- ADDED EXTRA PADDING TO PREVENT DOCK OVERLAP --- */
     #wishes.section {
       padding-top:20px;
       padding-bottom: max(120px, calc(env(safe-area-inset-bottom) + 90px));
@@ -1270,27 +1269,31 @@
       const initialActive = document.querySelector(".dock a.active") || document.querySelector(".dock a");
       moveBubble(initialActive);
 
+      // --- SIMPLIFIED OBSERVER LOGIC HERE ---
       if ("IntersectionObserver" in window) {
         const sections = ["top", "event", "gallery", "location"]
           .map(id => document.getElementById(id))
           .filter(Boolean);
 
-        const scrollObserver = new IntersectionObserver((entries) => {
-          const visibleEntries = entries.filter(entry => entry.isIntersecting);
-          if (!visibleEntries.length) return;
-
-          visibleEntries.sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-          const activeId = visibleEntries[0].target.id;
-          const targetLink = document.querySelector(`.dock a[href="#${activeId}"]`);
-          moveBubble(targetLink);
-        }, {
+        const observerOptions = {
           root: null,
-          rootMargin: "-40% 0px -40% 0px",
-          threshold: [0.1, 0.25, 0.5, 0.75]
-        });
+          rootMargin: "-20% 0px -40% 0px", // Just tracks what crosses the upper-middle of the screen
+          threshold: 0
+        };
+
+        const scrollObserver = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              const activeId = entry.target.id;
+              const targetLink = document.querySelector(`.dock a[href="#${activeId}"]`);
+              moveBubble(targetLink);
+            }
+          });
+        }, observerOptions);
 
         sections.forEach(sec => scrollObserver.observe(sec));
 
+        // Original image loading observer 
         const galleryObserver = new IntersectionObserver((entries) => {
           entries.forEach((entry) => {
             if (entry.isIntersecting) entry.target.classList.add("show");
@@ -1301,6 +1304,7 @@
       } else {
         thumbs.forEach((thumb) => thumb.classList.add("show"));
       }
+      // --------------------------------------
     });
 
     window.addEventListener("resize", () => {
