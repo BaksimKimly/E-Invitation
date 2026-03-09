@@ -194,8 +194,25 @@
     .thumb:nth-child(9) { grid-column: span 1; grid-row: span 1; } 
     .thumb:nth-child(10){ grid-column: span 2; grid-row: span 2; }
 
-    .dock { position: fixed; left: 50%; bottom: max(15px, env(safe-area-inset-bottom)); transform: translateX(-50%); display: flex; gap: 4px; padding: 6px; border-radius: 999px; background: rgba(20, 16, 12, 0.55); border: 1px solid rgba(255, 215, 150, 0.2); backdrop-filter: blur(20px) saturate(150%); -webkit-backdrop-filter: blur(20px) saturate(150%); z-index: 9000; letter-spacing: .02em; width: 90%; max-width: 380px; justify-content: space-between; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }#openingScreen .dock {
-  display: none !important;
+    .dock { 
+  position: fixed; left: 50%; bottom: max(15px, env(safe-area-inset-bottom)); 
+  transform: translateX(-50%); display: flex; gap: 4px; padding: 6px; 
+  border-radius: 999px; background: rgba(20, 16, 12, 0.55); 
+  border: 1px solid rgba(255, 215, 150, 0.2); 
+  backdrop-filter: blur(20px) saturate(150%); 
+  z-index: 9000; width: 90%; max-width: 380px; justify-content: space-between; 
+  box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+  
+  /* ADD THESE THREE LINES */
+  opacity: 0; 
+  visibility: hidden; 
+  transition: opacity 0.8s ease, visibility 0.8s ease; 
+}
+
+/* ADD THIS NEW CLASS */
+.dock.is-visible { 
+  opacity: 1; 
+  visibility: visible; 
 }
 
     .dock-bubble { position: absolute; top: 6px; bottom: 6px; left: 0; width: 0; background: linear-gradient(135deg, rgba(207, 163, 79, 0.25), rgba(207, 163, 79, 0.05)); border: 1px solid rgba(207, 163, 79, 0.5); border-radius: 999px; z-index: 1; box-shadow: 0 4px 15px rgba(207, 163, 79, 0.25), inset 0 1px 4px rgba(255, 255, 255, 0.15); transition: all 0.45s cubic-bezier(0.25, 1, 0.3, 1); transform: translateX(0); pointer-events: none; }
@@ -573,7 +590,15 @@ function changeLbImage(direction) {
     });
 
     window.addEventListener("resize", () => { setRealViewportHeight(); moveBubble(document.querySelector(".dock a.active")); });
-    openBtn.addEventListener("click", () => { startMusicOnce(); heroVideo?.play().catch(()=>{}); openingScreen.classList.add("is-leaving"); heroSection.classList.add("hero-reveal"); });
+   openBtn.addEventListener("click", () => { 
+  startMusicOnce(); 
+  heroVideo?.play().catch(()=>{}); 
+  openingScreen.classList.add("is-leaving"); 
+  heroSection.classList.add("hero-reveal");
+  
+  // ADD THIS LINE
+  navDock.classList.add("is-visible"); 
+});
     openingScreen.addEventListener("transitionend", (e) => { if (e.propertyName === "opacity" && openingScreen.classList.contains("is-leaving")) { openingScreen.style.display = "none"; unlockPageScroll(); } });
     document.addEventListener("click", (e) => { const a = e.target.closest('a[href^="#"]'); if (!a) return; e.preventDefault(); document.querySelector(a.getAttribute("href"))?.scrollIntoView({ behavior: "smooth", block: "start" }); });
     setInterval(tickCountdown, 1000);
@@ -581,6 +606,7 @@ function changeLbImage(direction) {
   </script>
 </body>
 </html>
+
 
 
 
