@@ -515,31 +515,33 @@ document.addEventListener('DOMContentLoaded', function() {
     preloadNextImage();
   }
   
-  // ✅ FIXED: Click RIGHT = Image slides RIGHT → New image from LEFT
-  // ✅ FIXED: Click LEFT = Image slides LEFT → New image from RIGHT  
-  function slideToNext(direction) {
-    const nextIndex = direction === 'next' ? 
-      (lbCurrentIndex + 1) % thumbImages.length : 
-      (lbCurrentIndex - 1 + thumbImages.length) % thumbImages.length;
-    
-    // Slide CURRENT image OUT in direction of swipe
-    lbImg.style.transition = 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)';
-    
-    if (direction === 'next') {
-      // Right swipe: current image moves RIGHT
-      lbImg.style.transform = 'translateX(100%)';
-    } else {
-      // Left swipe: current image moves LEFT  
-      lbImg.style.transform = 'translateX(-100%)';
-    }
-    lbImg.style.opacity = '0';
-    
-    setTimeout(() => {
-      // New image slides IN from opposite direction
-      lbCurrentIndex = nextIndex;
-      lbImg.src = thumbImages[nextIndex];
-    }, 125);
+function slideToNext(direction) {
+  const nextIndex = direction === 'next' ? 
+    (lbCurrentIndex + 1) % thumbImages.length : 
+    (lbCurrentIndex - 1 + thumbImages.length) % thumbImages.length;
+  
+  // Position new image OFFSCREEN first
+  lbImg.style.transition = 'none';
+  lbCurrentIndex = nextIndex;
+  lbImg.src = thumbImages[nextIndex];
+  
+  // Force layout before animation
+  lbImg.offsetHeight;
+  
+  // Animate NEW image from correct direction
+  lbImg.style.transition = 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)';
+  
+  if (direction === 'next') {
+    // Right swipe: NEW image slides LEFT→RIGHT
+    lbImg.style.transform = 'translateX(0)';
+    lbImg.style.opacity = '1';
+  } else {
+    // Left swipe: NEW image slides RIGHT→LEFT  
+    lbImg.style.transform = 'translateX(0)';
+    lbImg.style.opacity = '1';
   }
+}
+
   
   function closeLb() {
     lb.classList.remove("is-open");
@@ -562,20 +564,22 @@ document.addEventListener('DOMContentLoaded', function() {
     lbImg.style.transform = `translateX(${diff}px)`;  // Image follows finger
   }, { passive: false });
   
-  lb.addEventListener('touchend', e => {
-    if (!isDragging) return;
-    isDragging = false;
-    const endX = e.changedTouches[0].clientX;
-    const diff = endX - startX;  // Positive = swiped RIGHT
-    
-    if (Math.abs(diff) > 80) {
-      // Swiped RIGHT → NEXT image
-      slideToNext(diff > 0 ? 'next' : 'prev');
-    } else {
-      lbImg.style.transition = 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)';
-      lbImg.style.transform = 'translateX(0)';
-    }
-  }, { passive: false });
+lb.addEventListener('touchend', e => {
+  if (!isDragging) return;
+  isDragging = false;
+  const endX = e.changedTouches[0].clientX;
+  const diff = endX - startX;  // Positive = swiped RIGHT
+  
+  if (Math.abs(diff) > 80) {
+    // Right swipe → next image
+    slideToNext(diff > 0 ? 'next' : 'prev');
+  } else {
+    // Snap back
+    lbImg.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+    lbImg.style.transform = 'translateX(0)';
+  }
+}, { passive: false });
+
   
   // === CLICK HANDLING ===
   lbImg.addEventListener('click', function(e) {
@@ -700,6 +704,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </html>
 when I scrolled side to side, scrolled/swip right it goes left it goes the opposite.
 And I cant use the click on the far right or left functinon on the img to go to other img
+
 
 
 
