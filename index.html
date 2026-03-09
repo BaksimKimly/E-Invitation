@@ -475,35 +475,38 @@
     }
 
     // CROSS-ZOOM TRANSITION
-    function changeLbImage(direction) {
-      if (isAnimating) return;
-      isAnimating = true;
-      
-      // 1. Fade/Zoom current image out
-      lbImg.style.transition = "opacity 0.35s ease-in, transform 0.4s ease-in";
-      lbImg.style.opacity = "0";
-      lbImg.style.transform = "scale(1.05)";
-      
-      setTimeout(() => {
-        lbCurrentIndex = direction === 'next' ? (lbCurrentIndex + 1) % thumbImages.length : (lbCurrentIndex - 1 + thumbImages.length) % thumbImages.length;
-        
-        // 2. Prepare next image from small scale
-        lbImg.style.transition = "none";
-        lbImg.style.transform = "scale(0.95)";
-        lbImg.src = thumbImages[lbCurrentIndex];
-      }, 350);
-    }
+function changeLbImage(direction) {
+  if (isAnimating) return;
+  isAnimating = true;
+  
+  // Faster fade/zoom out
+  lbImg.style.transition = "opacity 0.2s ease-in, transform 0.25s ease-in";
+  lbImg.style.opacity = "0";
+  lbImg.style.transform = "scale(1.05)";
+  
+  setTimeout(() => {
+    lbCurrentIndex = direction === 'next' ? (lbCurrentIndex + 1) % thumbImages.length : (lbCurrentIndex - 1 + thumbImages.length) % thumbImages.length;
+    lbImg.style.transition = "none";
+    lbImg.style.transform = "scale(0.95)";
+    lbImg.src = thumbImages[lbCurrentIndex];
+  }, 200);  // Was 350ms
+}
 
     function closeLb() {
-      lb.classList.remove("is-open");
-      lb.setAttribute("aria-hidden", "true");
-      document.body.style.overflow = "";
-      document.documentElement.style.overflow = "";
-      lbImg.style.transition = "opacity 0.3s ease, transform 0.3s ease";
-      lbImg.style.opacity = "0";
-      lbImg.style.transform = "scale(0.9)";
-      setTimeout(() => { if (!lb.classList.contains("is-open")) { lbImg.src = ""; isAnimating = false; } }, 300);
-    }
+  lb.classList.remove("is-open");
+  lb.setAttribute("aria-hidden", "true");
+  document.body.style.overflow = "";
+  document.documentElement.style.overflow = "";
+  lbImg.style.transition = "opacity 0.2s ease, transform 0.2s ease";  // Faster close
+  lbImg.style.opacity = "0";
+  lbImg.style.transform = "scale(0.9)";
+  setTimeout(() => { 
+    if (!lb.classList.contains("is-open")) { 
+      lbImg.src = ""; 
+      isAnimating = false; 
+    } 
+  }, 200);  // Was 300ms
+}
 
     lbClose.addEventListener("click", (e) => { e.stopPropagation(); closeLb(); });
 
@@ -538,16 +541,16 @@
 
     // Animate image in when loaded
     lbImg.addEventListener("load", () => {
-      if (!lb.classList.contains("is-open")) return;
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          lbImg.style.transition = "opacity 0.5s ease-out, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)";
-          lbImg.style.opacity = "1";
-          lbImg.style.transform = "scale(1)";
-          setTimeout(() => { isAnimating = false; }, 500);
-        });
-      });
+  if (!lb.classList.contains("is-open")) return;
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      lbImg.style.transition = "opacity 0.3s ease-out, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)";
+      lbImg.style.opacity = "1";
+      lbImg.style.transform = "scale(1)";
+      setTimeout(() => { isAnimating = false; }, 300);  // Was 500ms
     });
+  });
+});
 
     thumbs.forEach((btn, idx) => btn.addEventListener("click", () => openLb(idx)));
 
@@ -576,6 +579,7 @@
   </script>
 </body>
 </html>
+
 
 
 
