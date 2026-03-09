@@ -203,13 +203,13 @@
   z-index: 9000; width: 90%; max-width: 380px; justify-content: space-between; 
   box-shadow: 0 10px 40px rgba(0,0,0,0.8);
   
-  /* ADD THESE THREE LINES */
+  /* HIDE BY DEFAULT */
   opacity: 0; 
   visibility: hidden; 
   transition: opacity 0.8s ease, visibility 0.8s ease; 
 }
 
-/* ADD THIS NEW CLASS */
+/* SHOW WHEN ACTIVE */
 .dock.is-visible { 
   opacity: 1; 
   visibility: visible; 
@@ -289,7 +289,7 @@
 
     .lb-close:hover { transform:rotate(90deg) scale(1.1); background:rgba(255,255,255,0.15); border-color:#ffffff; }
 
-    .lightbox img{ width:100%; max-width:500px; max-height:88vh; object-fit:contain; opacity:0; padding: 0 10px; will-change: transform, opacity; }
+    .lightbox img{ width:100%; max-width:500px; max-height:88vh; object-fit:contain; opacity:0; padding: 0 10px; will-change: transform, opacity; transition: opacity 0.3s ease; }
 
     @media (max-width:420px){ .pill{ min-width:145px; padding:10px 14px; font-size:13px; } .countdown{ gap:8px; } .cd{ padding:12px 4px 10px; } .cd b{ font-size:clamp(18px, 6vw, 28px); } }
 
@@ -483,7 +483,8 @@
       lbCurrentIndex = index;
       lbImg.style.transition = "none";
       lbImg.style.opacity = "0";
-      lbImg.style.transform = "scale(0.95)";
+      // We set transform to a side and snap it in
+      lbImg.style.transform = "translateX(-20px)"; 
       
       setTimeout(() => { lbImg.src = thumbImages[lbCurrentIndex]; }, 10);
       
@@ -500,17 +501,19 @@ function changeLbImage(direction) {
   
   const width = window.innerWidth;
   // Speed is set to 0.2s for a "Snap" feel
-  lbImg.style.transition = "transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)";
+  lbImg.style.transition = "transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease";
   
-  // Slide the current image out
+  // Slide the current image out and fade
   lbImg.style.transform = direction === 'next' ? `translateX(-${width}px)` : `translateX(${width}px)`;
+  lbImg.style.opacity = "0";
   
   setTimeout(() => {
     lbCurrentIndex = direction === 'next' ? (lbCurrentIndex + 1) % thumbImages.length : (lbCurrentIndex - 1 + thumbImages.length) % thumbImages.length;
     
-    // Teleport next image to the other side instantly (no transition)
+    // Teleport next image to the other side instantly (no transition, transparent)
     lbImg.style.transition = "none";
     lbImg.style.transform = direction === 'next' ? `translateX(${width}px)` : `translateX(-${width}px)`;
+    lbImg.style.opacity = "0";
     lbImg.src = thumbImages[lbCurrentIndex];
   }, 200); 
 }
@@ -563,14 +566,17 @@ function changeLbImage(direction) {
     }, {passive: true});
 
     // Animate image in when loaded
-   lbImg.addEventListener("load", () => {
-  if (!lb.classList.contains("is-open") || !isAnimating) return;
+  lbImg.addEventListener("load", () => {
+  if (!lb.classList.contains("is-open")) return;
   
+  // Instantly show the new image on teleport, and *then* slide it
   requestAnimationFrame(() => {
-    lbImg.style.transition = "transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)";
-    lbImg.style.opacity = "1";
-    lbImg.style.transform = "translateX(0)";
-    setTimeout(() => { isAnimating = false; }, 250);
+    requestAnimationFrame(() => {
+      lbImg.style.transition = "transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease";
+      lbImg.style.opacity = "1";
+      lbImg.style.transform = "translateX(0)";
+      setTimeout(() => { isAnimating = false; }, 250);
+    });
   });
 });
 
