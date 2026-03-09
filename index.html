@@ -230,7 +230,7 @@
 
     @keyframes heroCardRise{ 0%{ opacity:0; transform:translateY(24px) scale(.98); } 100%{ opacity:1; transform:translateY(0) scale(1); } }
 
-    .lightbox{ position:fixed; inset:0; margin:0 auto; width:100%; max-width:500px; background:rgba(0,0,0,.96); display:flex; align-items:center; justify-content:center; z-index:10000; padding:0; opacity:0; visibility:hidden; pointer-events:none; transition:opacity .35s ease, visibility .35s ease; cursor: default; }
+    .lightbox{ position:fixed; inset:0; margin:0 auto; width:100%; max-width:500px; background:rgba(0,0,0,.92); display:flex; align-items:center; justify-content:center; z-index:10000; padding:0; opacity:0; visibility:hidden; pointer-events:none; transition:opacity .35s ease, visibility .35s ease; cursor: default; }
 
     .lightbox.is-open{ opacity:1; visibility:visible; pointer-events:auto; }
 
@@ -242,8 +242,7 @@
 
     .lb-close:hover { transform:rotate(90deg) scale(1.1); background:rgba(255,255,255,0.15); border-color:#ffffff; }
 
-    /* Updated CSS for Slide/Snap transition */
-    .lightbox img{ width:100%; max-width:500px; max-height:88vh; object-fit:contain; opacity:1; padding: 0 10px; will-change: transform; transition: transform 0.4s cubic-bezier(0.25, 1, 0.3, 1); transform: translateX(0); }
+    .lightbox img{ width:100%; max-width:500px; max-height:88vh; object-fit:contain; opacity:0; padding: 0 10px; will-change: transform, opacity; }
 
     @media (max-width:420px){ .pill{ min-width:145px; padding:10px 14px; font-size:13px; } .countdown{ gap:8px; } .cd{ padding:12px 4px 10px; } .cd b{ font-size:clamp(18px, 6vw, 28px); } }
 
@@ -436,8 +435,10 @@
     function openLb(index) {
       lbCurrentIndex = index;
       lbImg.style.transition = "none";
-      lbImg.style.transform = "translateX(0)";
-      lbImg.src = thumbImages[lbCurrentIndex];
+      lbImg.style.opacity = "0";
+      lbImg.style.transform = "scale(0.95)";
+      
+      setTimeout(() => { lbImg.src = thumbImages[lbCurrentIndex]; }, 10);
       
       lb.classList.add("is-open");
       lb.setAttribute("aria-hidden", "false");
@@ -445,30 +446,24 @@
       document.documentElement.style.overflow = "hidden";
     }
 
-    // Updated Slide/Snap Transition (No fade to black)
+    // CROSS-ZOOM TRANSITION
     function changeLbImage(direction) {
       if (isAnimating) return;
       isAnimating = true;
       
-      const width = window.innerWidth;
-      const slideOutParams = direction === 'next' ? `-${width}px` : `${width}px`;
-      const slideInParams = direction === 'next' ? `${width}px` : `-${width}px`;
-
-      // 1. Slide OUT current image
-      lbImg.style.transition = "transform 0.4s cubic-bezier(0.25, 1, 0.3, 1)";
-      lbImg.style.transform = `translateX(${slideOutParams})`;
+      // 1. Fade/Zoom current image out
+      lbImg.style.transition = "opacity 0.35s ease-in, transform 0.4s ease-in";
+      lbImg.style.opacity = "0";
+      lbImg.style.transform = "scale(1.05)";
       
       setTimeout(() => {
-        // 2. Swivel current index
         lbCurrentIndex = direction === 'next' ? (lbCurrentIndex + 1) % thumbImages.length : (lbCurrentIndex - 1 + thumbImages.length) % thumbImages.length;
         
-        // 3. Teleport NEW image to opposite side instantly
+        // 2. Prepare next image from small scale
         lbImg.style.transition = "none";
-        lbImg.style.transform = `translateX(${slideInParams})`;
+        lbImg.style.transform = "scale(0.95)";
         lbImg.src = thumbImages[lbCurrentIndex];
-        
-        // 4. Slide NEW image IN (triggers on onload below)
-      }, 400); 
+      }, 350);
     }
 
     function closeLb() {
@@ -476,14 +471,15 @@
       lb.setAttribute("aria-hidden", "true");
       document.body.style.overflow = "";
       document.documentElement.style.overflow = "";
-      lbImg.style.transition = "transform 0.3s ease";
-      lbImg.style.transform = "translateX(0) scale(0.9)";
-      setTimeout(() => { if (!lb.classList.contains("is-open")) { lbImg.src = ""; lbImg.style.transform = "translateX(0)"; isAnimating = false; } }, 300);
+      lbImg.style.transition = "opacity 0.3s ease, transform 0.3s ease";
+      lbImg.style.opacity = "0";
+      lbImg.style.transform = "scale(0.9)";
+      setTimeout(() => { if (!lb.classList.contains("is-open")) { lbImg.src = ""; isAnimating = false; } }, 300);
     }
 
     lbClose.addEventListener("click", (e) => { e.stopPropagation(); closeLb(); });
 
-    // Click Detection on specific areas (Hot Zones)
+    // HOT-ZONE CLICK DETECTION
     lb.addEventListener("click", (e) => {
       if (e.target === lbImg || e.target === lb) {
         const x = e.clientX;
@@ -512,15 +508,16 @@
       if (touchendX - touchstartX > 50) changeLbImage('prev');
     }, {passive: true});
 
-    // Snap NEW image IN when loaded
+    // Animate image in when loaded
     lbImg.addEventListener("load", () => {
-      if (!lb.classList.contains("is-open") || !isAnimating) return;
-      
-      // Force slide in from the correct teleported side
+      if (!lb.classList.contains("is-open")) return;
       requestAnimationFrame(() => {
-        lbImg.style.transition = "transform 0.45s cubic-bezier(0.16, 1, 0.3, 1)";
-        lbImg.style.transform = "translateX(0)";
-        setTimeout(() => { isAnimating = false; }, 450);
+        requestAnimationFrame(() => {
+          lbImg.style.transition = "opacity 0.5s ease-out, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)";
+          lbImg.style.opacity = "1";
+          lbImg.style.transform = "scale(1)";
+          setTimeout(() => { isAnimating = false; }, 500);
+        });
       });
     });
 
