@@ -498,17 +498,21 @@ function changeLbImage(direction) {
   if (isAnimating) return;
   isAnimating = true;
   
-  // Faster fade/zoom out
-  lbImg.style.transition = "opacity 0.2s ease-in, transform 0.25s ease-in";
-  lbImg.style.opacity = "0";
-  lbImg.style.transform = "scale(1.05)";
+  const width = window.innerWidth;
+  // Speed is set to 0.2s for a "Snap" feel
+  lbImg.style.transition = "transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)";
+  
+  // Slide the current image out
+  lbImg.style.transform = direction === 'next' ? `translateX(-${width}px)` : `translateX(${width}px)`;
   
   setTimeout(() => {
     lbCurrentIndex = direction === 'next' ? (lbCurrentIndex + 1) % thumbImages.length : (lbCurrentIndex - 1 + thumbImages.length) % thumbImages.length;
+    
+    // Teleport next image to the other side instantly (no transition)
     lbImg.style.transition = "none";
-    lbImg.style.transform = "scale(0.95)";
+    lbImg.style.transform = direction === 'next' ? `translateX(${width}px)` : `translateX(-${width}px)`;
     lbImg.src = thumbImages[lbCurrentIndex];
-  }, 200);  // Was 350ms
+  }, 200); 
 }
 
     function closeLb() {
@@ -559,15 +563,14 @@ function changeLbImage(direction) {
     }, {passive: true});
 
     // Animate image in when loaded
-    lbImg.addEventListener("load", () => {
-  if (!lb.classList.contains("is-open")) return;
+   lbImg.addEventListener("load", () => {
+  if (!lb.classList.contains("is-open") || !isAnimating) return;
+  
   requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      lbImg.style.transition = "opacity 0.3s ease-out, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)";
-      lbImg.style.opacity = "1";
-      lbImg.style.transform = "scale(1)";
-      setTimeout(() => { isAnimating = false; }, 300);  // Was 500ms
-    });
+    lbImg.style.transition = "transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)";
+    lbImg.style.opacity = "1";
+    lbImg.style.transform = "translateX(0)";
+    setTimeout(() => { isAnimating = false; }, 250);
   });
 });
 
@@ -606,11 +609,3 @@ function changeLbImage(direction) {
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
