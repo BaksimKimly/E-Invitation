@@ -569,22 +569,23 @@
       box-shadow:0 10px 40px rgba(0,0,0,0.8);
     }
 
+    /* HOLLOW GOLD BUBBLE */
     .dock-bubble{
       position:absolute;
       top:6px;
       bottom:6px;
       left:0;
       width:0;
-      background:transparent;
-      border:1.5px solid rgba(207, 163, 79, 0.9);
-      border-radius:999px;
-      z-index:1;
-      box-shadow:
-        0 0 8px rgba(207, 163, 79, 0.25),
-        inset 0 0 8px rgba(207, 163, 79, 0.25);
-      transition:all 0.45s cubic-bezier(0.25, 1, 0.3, 1);
-      transform:translateX(0);
-      pointer-events:none;
+      background: transparent; /* Makes it hollow */
+      border: 1.5px solid rgba(207, 163, 79, 0.9); /* Solid golden ring */
+      border-radius: 999px;
+      z-index: 1;
+      box-shadow: 
+        0 0 8px rgba(207, 163, 79, 0.25), /* Outer subtle glow */
+        inset 0 0 8px rgba(207, 163, 79, 0.25); /* Inner subtle glow */
+      transition: all 0.45s cubic-bezier(0.25, 1, 0.3, 1);
+      transform: translateX(0);
+      pointer-events: none;
     }
 
     .dock a{
