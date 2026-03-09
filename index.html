@@ -495,7 +495,7 @@
       margin-top:20px;
     }
 
-    /* TIGHTER GRID SPACING (Original Code Grid Settings) */
+    /* TIGHTER GRID SPACING */
     .grid {
       margin-top: 10px;
       display: grid;
@@ -510,9 +510,9 @@
       display: none;
     }
 
-    /* REMOVED PADDING SO PICTURE FITS THE BORDER EXACTLY (Original Code Settings) */
+    /* WHITE-ISH BORDERS FOR GALLERY THUMBS */
     .thumb {
-      border: 1px solid rgba(207, 163, 79, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.16);
       padding: 0; 
       border-radius: 6px; 
       overflow: hidden;
@@ -542,10 +542,11 @@
       filter: brightness(0.9) contrast(1.05);
     }
 
+    /* WHITE-ISH HOVER EFFECT */
     .thumb:hover {
-      border-color: #f6e27a; 
-      background: rgba(207, 163, 79, 0.15); 
-      box-shadow: 0 12px 35px rgba(0,0,0,0.9), 0 0 25px rgba(207,163,79,0.4); 
+      border-color: rgba(255, 255, 255, 0.4); 
+      background: rgba(255, 255, 255, 0.1); 
+      box-shadow: 0 12px 35px rgba(0,0,0,0.9), 0 0 20px rgba(255,255,255,0.15); 
       z-index: 2;
     }
 
@@ -565,7 +566,7 @@
     .thumb:nth-child(9) { grid-column: span 1; grid-row: span 1; } 
     .thumb:nth-child(10){ grid-column: span 2; grid-row: span 2; }
 
-    /* --- THEME-MATCHED DARK GLASS DOCK (From Latest Code) --- */
+    /* --- THEME-MATCHED DARK GLASS DOCK --- */
     .dock {
       position: fixed;
       left: 50%;
@@ -589,7 +590,7 @@
       box-shadow: 0 10px 40px rgba(0,0,0,0.8);
     }
 
-    /* THE BUBBLE - Golden glass effect (From Latest Code) */
+    /* THE BUBBLE - Golden glass effect */
     .dock-bubble {
       position: absolute;
       top: 6px;
