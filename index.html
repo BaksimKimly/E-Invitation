@@ -943,15 +943,15 @@
       border-color:#ffffff;
     }
 
+    /* Images controlled entirely by JS for precise slideshow behavior */
     .lightbox img{
       width:100%;
       max-width:500px;
       max-height:88vh;
       object-fit:contain;
       opacity:0;
-      transform:scale(.95);
-      transition:opacity .25s ease, transform .25s ease;
       padding: 0 10px;
+      will-change: transform, opacity;
     }
 
     @media (max-width:420px){
@@ -1261,56 +1261,90 @@
 
     /* --- ADVANCED SWIPE-ONLY LIGHTBOX LOGIC --- */
     let lbCurrentIndex = 0;
+    let isAnimating = false;
     const thumbImages = thumbs.map(btn => btn.dataset.full);
 
     function openLb(index) {
       lbCurrentIndex = index;
-      lbImg.style.opacity = "0";
-      lbImg.style.transform = "scale(.95)";
       
+      // 1. Initial zoom-in state before image is loaded
+      lbImg.style.transition = "none";
+      lbImg.style.opacity = "0";
+      lbImg.style.transform = "scale(0.85)";
+      
+      // Set the source (this triggers the load listener below)
       setTimeout(() => {
         lbImg.src = thumbImages[lbCurrentIndex];
-      }, 50);
+      }, 10);
 
       lb.classList.add("is-open");
       lb.setAttribute("aria-hidden", "false");
+      
+      // Lock website scrolling
       document.body.style.overflow = "hidden";
       document.documentElement.style.overflow = "hidden";
     }
 
     function changeLbImage(direction) {
+      if (isAnimating) return;
+      isAnimating = true;
+      
+      // 1. Slide current image OUT smoothly
+      lbImg.style.transition = "opacity 0.25s ease-in, transform 0.3s ease-in";
       lbImg.style.opacity = "0";
-      lbImg.style.transform = direction === 'next' ? "translateX(20px) scale(0.95)" : "translateX(-20px) scale(0.95)";
+      lbImg.style.transform = direction === 'next' ? "translateX(-60px)" : "translateX(60px)";
       
       setTimeout(() => {
+        // 2. Update to the next or previous index
         if (direction === 'next') {
           lbCurrentIndex = (lbCurrentIndex + 1) % thumbImages.length;
         } else {
           lbCurrentIndex = (lbCurrentIndex - 1 + thumbImages.length) % thumbImages.length;
         }
+        
+        // 3. Move instantly to opposite side for the slide IN effect
+        lbImg.style.transition = "none";
+        lbImg.style.transform = direction === 'next' ? "translateX(60px)" : "translateX(-60px)";
+        
+        // 4. Change source (this triggers the load event to animate it back in)
         lbImg.src = thumbImages[lbCurrentIndex];
-      }, 250); 
+      }, 300); // Wait for the slide out animation to finish
     }
 
     function closeLb() {
       lb.classList.remove("is-open");
       lb.setAttribute("aria-hidden", "true");
+      
+      // Unlock scrolling
       document.body.style.overflow = "";
       document.documentElement.style.overflow = "";
+
+      // Smooth fade out scale back
+      lbImg.style.transition = "opacity 0.3s ease, transform 0.3s ease";
+      lbImg.style.opacity = "0";
+      lbImg.style.transform = "scale(0.9)";
 
       setTimeout(() => {
         if (!lb.classList.contains("is-open")) {
           lbImg.src = "";
+          isAnimating = false;
         }
-      }, 350);
+      }, 300);
     }
 
     lbClose.addEventListener("click", closeLb);
 
     lb.addEventListener("click", (e) => {
+      // Close only if clicking the background, not the image itself
       if (e.target === lb) closeLb();
     });
 
+    // CRITICAL FIX: Stop mobile phones from scrolling the website in the background while swiping photos
+    lb.addEventListener("touchmove", (e) => {
+      e.preventDefault();
+    }, { passive: false });
+
+    // Keyboard navigation for desktop
     document.addEventListener("keydown", (e) => {
       if (lb.classList.contains("is-open")) {
         if (e.key === "Escape") closeLb();
@@ -1329,14 +1363,25 @@
 
     lb.addEventListener('touchend', e => {
       touchendX = e.changedTouches[0].screenX;
-      if (touchendX < touchstartX - 40) changeLbImage('next');
-      if (touchendX > touchstartX + 40) changeLbImage('prev');
+      // Require a minimum swipe distance of 40px so accidental taps aren't counted
+      if (touchstartX - touchendX > 40) changeLbImage('next');
+      if (touchendX - touchstartX > 40) changeLbImage('prev');
     }, {passive: true});
 
+    // Animate image IN when loaded
     lbImg.addEventListener("load", () => {
+      if (!lb.classList.contains("is-open")) return;
+      
       requestAnimationFrame(() => {
-        lbImg.style.opacity = "1";
-        lbImg.style.transform = "translateX(0) scale(1)";
+        requestAnimationFrame(() => {
+          lbImg.style.transition = "opacity 0.35s ease-out, transform 0.4s cubic-bezier(0.25, 1, 0.3, 1)";
+          lbImg.style.opacity = "1";
+          lbImg.style.transform = "translateX(0) scale(1)";
+          
+          setTimeout(() => {
+            isAnimating = false;
+          }, 400);
+        });
       });
     });
 
