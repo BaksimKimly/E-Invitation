@@ -458,90 +458,73 @@
     <source src="music.mp3" type="audio/mpeg" />
   </audio>
 
-  <script>
-    const EVENT = { title: "The Wedding of Tan Baksim & Try Kimly", details: "Request the honor of your presence on the auspicious occasion of the wedding reception.", locationName: "The Premier Center Sensok (Building D&E), Phnom Penh, Cambodia", startLocalISO: "2026-03-29T17:00:00+07:00", endLocalISO: "2026-03-29T19:00:00+07:00" };
-    const heroVideo = document.getElementById("heroVideo"), heroSection = document.querySelector(".hero"), openBtn = document.getElementById("openBtn"), openingScreen = document.getElementById("openingScreen"), audio = document.getElementById("bgMusic"), navDock = document.getElementById("navDock"), dockBubble = document.getElementById("dockBubble"), navLinks = document.querySelectorAll(".dock a"), elDays = document.getElementById("dDays"), elHours = document.getElementById("dHours"), elMins = document.getElementById("dMins"), elSecs = document.getElementById("dSecs"), lb = document.getElementById("lightbox"), lbImg = document.getElementById("lbImg"), lbClose = document.getElementById("lbClose"), thumbs = Array.from(document.querySelectorAll(".thumb"));
-    let musicStarted = false;
-
-    function setRealViewportHeight() { document.documentElement.style.setProperty("--vh", `${window.innerHeight * 0.01}px`); }
-    function startMusicOnce() { if (musicStarted) return; musicStarted = true; audio.play().catch(() => {}); removeMusicListeners(); }
-    function removeMusicListeners() { document.removeEventListener("click", startMusicOnce); document.removeEventListener("touchstart", startMusicOnce); }
-    function unlockPageScroll() { document.documentElement.classList.remove("scroll-lock"); document.body.classList.remove("scroll-lock"); setRealViewportHeight(); moveBubble(document.querySelector(".dock a.active") || document.querySelector(".dock a")); }
-
-    function moveBubble(targetLink) {
-      if (!targetLink || !dockBubble || !navDock) return;
-      const linkRect = targetLink.getBoundingClientRect(), dockRect = navDock.getBoundingClientRect(), leftPos = linkRect.left - dockRect.left;
-      dockBubble.style.width = `${linkRect.width}px`;
-      dockBubble.style.transform = `translateX(${leftPos}px)`;
-      navLinks.forEach(link => link.classList.remove("active"));
-      targetLink.classList.add("active");
-    }
-
-    function tickCountdown() {
-      const diff = new Date(EVENT.startLocalISO) - new Date();
-      if (diff <= 0) { [elDays, elHours, elMins, elSecs].forEach(el => el.textContent = "0"); return; }
-      const sec = Math.floor(diff / 1000);
-      elDays.textContent = Math.floor(sec / 86400);
-      elHours.textContent = String(Math.floor((sec % 86400) / 3600)).padStart(2, "0");
-      elMins.textContent = String(Math.floor((sec % 3600) / 60)).padStart(2, "0");
-      elSecs.textContent = String(sec % 60).padStart(2, "0");
-    }
-
-  /* --- SEAMLESS SLIDING LIGHTBOX --- */
-let lbCurrentIndex = 0, isAnimating = false;
+<script>
+const EVENT = { title: "The Wedding of Tan Baksim & Try Kimly", details: "Request the honor of your presence on the auspicious occasion of the wedding reception.", locationName: "The Premier Center Sensok (Building D&E), Phnom Penh, Cambodia", startLocalISO: "2026-03-29T17:00:00+07:00", endLocalISO: "2026-03-29T19:00:00+07:00" };
+const heroVideo = document.getElementById("heroVideo"), heroSection = document.querySelector(".hero"), openBtn = document.getElementById("openBtn"), openingScreen = document.getElementById("openingScreen"), audio = document.getElementById("bgMusic"), navDock = document.getElementById("navDock"), dockBubble = document.getElementById("dockBubble"), navLinks = document.querySelectorAll(".dock a"), elDays = document.getElementById("dDays"), elHours = document.getElementById("dHours"), elMins = document.getElementById("dMins"), elSecs = document.getElementById("dSecs"), lb = document.getElementById("lightbox"), lbImg = document.getElementById("lbImg"), lbClose = document.getElementById("lbClose"), thumbs = Array.from(document.querySelectorAll(".thumb"));
+let musicStarted = false, lbCurrentIndex = 0, isAnimating = false;
 const thumbImages = thumbs.map(btn => btn.dataset.full);
 
-// Create 3 image slots for seamless sliding
-const lbImages = [
-  lbImg.cloneNode(),
-  lbImg.cloneNode(),
-  lbImg.cloneNode()
-];
-lbImages.forEach((img, i) => {
-  img.style.position = 'absolute';
-  img.style.width = '100%';
-  img.style.height = '100%';
-  img.style.objectFit = 'contain';
-  img.style.maxWidth = '500px';
-  img.style.maxHeight = '88vh';
-  img.style.left = '0';
-  img.style.top = '0';
-  img.style.opacity = '0';
-  img.style.transform = 'translateX(0)';
-  img.style.transition = 'transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease';
-  img.style.padding = '0 10px';
+// === UTILITY FUNCTIONS ===
+function setRealViewportHeight() { document.documentElement.style.setProperty("--vh", `${window.innerHeight * 0.01}px`); }
+function startMusicOnce() { if (musicStarted) return; musicStarted = true; audio.play().catch(() => {}); document.removeEventListener("click", startMusicOnce); document.removeEventListener("touchstart", startMusicOnce); }
+function unlockPageScroll() { document.documentElement.classList.remove("scroll-lock"); document.body.classList.remove("scroll-lock"); setRealViewportHeight(); moveBubble(document.querySelector(".dock a.active") || document.querySelector(".dock a")); }
+function moveBubble(targetLink) { if (!targetLink || !dockBubble || !navDock) return; const linkRect = targetLink.getBoundingClientRect(), dockRect = navDock.getBoundingClientRect(), leftPos = linkRect.left - dockRect.left; dockBubble.style.width = `${linkRect.width}px`; dockBubble.style.transform = `translateX(${leftPos}px)`; navLinks.forEach(link => link.classList.remove("active")); targetLink.classList.add("active"); }
+function tickCountdown() { const diff = new Date(EVENT.startLocalISO) - new Date(); if (diff <= 0) { [elDays, elHours, elMins, elSecs].forEach(el => el.textContent = "0"); return; } const sec = Math.floor(diff / 1000); elDays.textContent = Math.floor(sec / 86400); elHours.textContent = String(Math.floor((sec % 86400) / 3600)).padStart(2, "0"); elMins.textContent = String(Math.floor((sec % 3600) / 60)).padStart(2, "0"); elSecs.textContent = String(sec % 60).padStart(2, "0"); }
+
+// === PERFECT SEAMLESS LIGHTBOX ===
+const lbImages = [0,1,2].map(() => {
+  const img = document.createElement('img');
+  img.dataset.loaded = 'false';
+  img.style.cssText = `
+    position:absolute; left:0; top:0; width:100%; height:100%; max-width:500px; max-height:88vh;
+    object-fit:contain; opacity:0; transform:translateX(100%); padding:0 10px; transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
+    will-change:transform,opacity;
+  `;
   lb.appendChild(img);
+  return img;
 });
 lbImg.style.display = 'none'; // Hide original
 
-function slideTo(index, direction = 1) {
+function waitForImage(img, src) {
+  return new Promise((resolve) => {
+    if (img.dataset.loaded === 'true' && img.src === src) return resolve();
+    img.onload = () => { img.dataset.loaded = 'true'; resolve(); };
+    img.onerror = () => resolve(); // Continue even if fails
+    img.src = src;
+  });
+}
+
+async function slideTo(index, direction = 1) {
   if (isAnimating) return;
   isAnimating = true;
   
   const prevIndex = (index - direction + thumbImages.length) % thumbImages.length;
+  const nextIndex = (index + 1) % thumbImages.length;
   
-  // Load images
-  lbImages[0].src = thumbImages[prevIndex];
-  lbImages[1].src = thumbImages[index];
-  lbImages[2].src = thumbImages[(index + 1) % thumbImages.length];
-  
-  // Position: left=prev, center=current, right=next
+  // Pre-position all 3 images
   lbImages[0].style.transform = 'translateX(-100%)';
   lbImages[1].style.transform = 'translateX(0)';
   lbImages[2].style.transform = 'translateX(100%)';
   
-  // Show center image
+  // Load images (async but fast)
+  await Promise.all([
+    waitForImage(lbImages[0], thumbImages[prevIndex]),
+    waitForImage(lbImages[1], thumbImages[index]),
+    waitForImage(lbImages[2], thumbImages[nextIndex])
+  ]);
+  
+  // Animate slide
   lbImages.forEach((img, i) => {
-    img.style.opacity = i === 1 ? '1' : '0';
+    img.style.opacity = '1';
   });
   
   lbCurrentIndex = index;
-  setTimeout(() => { isAnimating = false; }, 250);
+  setTimeout(() => { isAnimating = false; }, 300);
 }
 
 function openLb(index) {
   lbCurrentIndex = index;
-  slideTo(index);
+  slideTo(index, 0);
   lb.classList.add("is-open");
   lb.setAttribute("aria-hidden", "false");
   document.body.style.overflow = "hidden";
@@ -549,9 +532,7 @@ function openLb(index) {
 }
 
 function changeLbImage(direction) {
-  const newIndex = direction === 'next' 
-    ? (lbCurrentIndex + 1) % thumbImages.length 
-    : (lbCurrentIndex - 1 + thumbImages.length) % thumbImages.length;
+  const newIndex = direction === 'next' ? (lbCurrentIndex + 1) % thumbImages.length : (lbCurrentIndex - 1 + thumbImages.length) % thumbImages.length;
   slideTo(newIndex, direction === 'next' ? 1 : -1);
 }
 
@@ -560,87 +541,84 @@ function closeLb() {
   lb.setAttribute("aria-hidden", "true");
   document.body.style.overflow = "";
   document.documentElement.style.overflow = "";
-  lbImages.forEach(img => {
-    img.style.opacity = '0';
-    img.style.transform = 'translateX(0)';
-  });
+  lbImages.forEach(img => img.style.opacity = '0');
   setTimeout(() => { isAnimating = false; }, 200);
 }
 
-// Preload next/prev images on load
-lbImages.forEach(img => {
-  img.addEventListener("load", () => {
-    if (lb.classList.contains("is-open")) {
-      img.style.opacity = img.style.transform === 'translateX(0)' ? '1' : '0';
-    }
-  });
-});
+// === EVENT LISTENERS ===
+lbClose.onclick = (e) => { e.stopPropagation(); closeLb(); };
 
-lbClose.addEventListener("click", (e) => { e.stopPropagation(); closeLb(); });
+lb.onclick = (e) => {
+  if (e.target !== lb) return;
+  const x = e.clientX, w = window.innerWidth;
+  if (x < w * 0.3) changeLbImage('prev');
+  else if (x > w * 0.7) changeLbImage('next');
+  else closeLb();
+};
 
-// HOT-ZONE CLICK DETECTION
-lb.addEventListener("click", (e) => {
-  if (e.target === lb || e.target === lbClose) {
-    const x = e.clientX;
-    const width = window.innerWidth;
-    const leftZone = width * 0.3;
-    const rightZone = width * 0.7;
-
-    if (x < leftZone) {
-      changeLbImage('prev');
-    } else if (x > rightZone) {
-      changeLbImage('next');
-    } else if (e.target === lb) {
-      closeLb();
-    }
-  }
-});
-
-// Touch Swipe
+// Touch support
 let touchstartX = 0;
-lb.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; }, {passive: true});
+lb.addEventListener('touchstart', e => { touchstartX = e.touches[0].screenX; }, {passive: true});
 lb.addEventListener('touchend', e => {
   const touchendX = e.changedTouches[0].screenX;
   if (touchstartX - touchendX > 50) changeLbImage('next');
   if (touchendX - touchstartX > 50) changeLbImage('prev');
 }, {passive: true});
+lb.addEventListener("touchmove", e => e.preventDefault(), { passive: false });
 
-lb.addEventListener("touchmove", (e) => { e.preventDefault(); }, { passive: false });
+thumbs.forEach((btn, idx) => btn.onclick = () => openLb(idx));
 
-thumbs.forEach((btn, idx) => btn.addEventListener("click", () => openLb(idx)));
+// === PAGE INIT ===
+document.addEventListener("DOMContentLoaded", () => {
+  setRealViewportHeight(); 
+  tickCountdown(); 
+  moveBubble(document.querySelector(".dock a.active"));
+  
+  if ("IntersectionObserver" in window) {
+    const sections = ["top", "event", "gallery", "location"].map(id => document.getElementById(id)).filter(Boolean);
+    const scrollObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => entry.isIntersecting && moveBubble(document.querySelector(`.dock a[href="#${entry.target.id}"]`)));
+    }, { rootMargin: "-50% 0px -50% 0px", threshold: 0 });
+    sections.forEach(sec => scrollObserver.observe(sec));
+    
+    const galleryObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => entry.isIntersecting && entry.target.classList.add("show"));
+    }, { threshold: 0.15 });
+    thumbs.forEach(thumb => galleryObserver.observe(thumb));
+  }
+});
 
+window.onresize = () => { setRealViewportHeight(); moveBubble(document.querySelector(".dock a.active")); };
 
-    /* --- SCROLL LOGIC & OBSERVER --- */
-    document.addEventListener("DOMContentLoaded", () => {
-      setRealViewportHeight(); tickCountdown(); moveBubble(document.querySelector(".dock a.active"));
-      if ("IntersectionObserver" in window) {
-        const sections = ["top", "event", "gallery", "location"].map(id => document.getElementById(id)).filter(Boolean);
-        const scrollObserver = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) moveBubble(document.querySelector(`.dock a[href="#${entry.target.id}"]`));
-          });
-        }, { rootMargin: "-50% 0px -50% 0px", threshold: 0 });
-        sections.forEach(sec => scrollObserver.observe(sec));
-        const galleryObserver = new IntersectionObserver((entries) => { entries.forEach((entry) => { if (entry.isIntersecting) entry.target.classList.add("show"); }); }, { threshold: 0.15 });
-        thumbs.forEach((thumb) => galleryObserver.observe(thumb));
-      }
-    });
-
-    window.addEventListener("resize", () => { setRealViewportHeight(); moveBubble(document.querySelector(".dock a.active")); });
-   openBtn.addEventListener("click", () => { 
+openBtn.onclick = () => { 
   startMusicOnce(); 
   heroVideo?.play().catch(()=>{}); 
   openingScreen.classList.add("is-leaving"); 
   heroSection.classList.add("hero-reveal");
-  
-  // ADD THIS LINE
   navDock.classList.add("is-visible"); 
-});
-    openingScreen.addEventListener("transitionend", (e) => { if (e.propertyName === "opacity" && openingScreen.classList.contains("is-leaving")) { openingScreen.style.display = "none"; unlockPageScroll(); } });
-    document.addEventListener("click", (e) => { const a = e.target.closest('a[href^="#"]'); if (!a) return; e.preventDefault(); document.querySelector(a.getAttribute("href"))?.scrollIntoView({ behavior: "smooth", block: "start" }); });
-    setInterval(tickCountdown, 1000);
-    document.getElementById("btnCalendar").addEventListener("click", () => { window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(EVENT.title)}&dates=${new Date(EVENT.startLocalISO).toISOString().replace(/-|:|\.\d\d\d/g,"")}/${new Date(EVENT.endLocalISO).toISOString().replace(/-|:|\.\d\d\d/g,"")}&details=${encodeURIComponent(EVENT.details)}&location=${encodeURIComponent(EVENT.locationName)}`, "_blank"); });
-  </script>
+};
+
+openingScreen.ontransitionend = (e) => { 
+  if (e.propertyName === "opacity" && openingScreen.classList.contains("is-leaving")) { 
+    openingScreen.style.display = "none"; 
+    unlockPageScroll(); 
+  } 
+};
+
+document.onclick = (e) => { 
+  const a = e.target.closest('a[href^="#"]'); 
+  if (!a) return; 
+  e.preventDefault(); 
+  document.querySelector(a.getAttribute("href"))?.scrollIntoView({ behavior: "smooth", block: "start" }); 
+};
+
+setInterval(tickCountdown, 1000);
+document.getElementById("btnCalendar").onclick = () => { 
+  window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(EVENT.title)}&dates=${new Date(EVENT.startLocalISO).toISOString().replace(/-|:|\\.\\d\\d\\d/g,"")}/${new Date(EVENT.endLocalISO).toISOString().replace(/-|:|\\.\\d\\d\\d/g,"")}&details=${encodeURIComponent(EVENT.details)}&location=${encodeURIComponent(EVENT.locationName)}`, "_blank"); 
+};
+</script>
+
 </body>
 </html>
+
 
