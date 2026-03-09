@@ -88,32 +88,38 @@
 
     .open-logo{ width:100%; height:auto; object-fit:contain; user-select:none; filter:drop-shadow(0 18px 40px rgba(0,0,0,.55)) drop-shadow(0 0 8px rgba(255,241,176,.10)) drop-shadow(0 0 16px rgba(207,163,79,.08)); animation:logoGoldGlow 4.5s ease-in-out infinite; }
 
-.open-btn--lux{
-  position:relative;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-
-  padding:16px 50px; /* keeps text same but gives frame space */
-  min-width:190px;
-
-  border:none;
-  background:none;
-  box-shadow:none;
-  backdrop-filter:none;
-  -webkit-backdrop-filter:none;
-
-  cursor:pointer;
+.open-btn--lux {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 26px 60px;  /* More padding for frame inner space */
+  min-width: 250px;     /* Wider to match typical frame proportions */
+  border: none;
+  background: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  cursor: pointer;
+  overflow: hidden;     /* Contains frame within button */
+  border-radius: 20px;  /* Optional: rounds frame edges */
 }
 
-/* Decorative frame image */
-.open-btn--lux::before{
-  content:"";
-  position:absolute;
-  inset:-10px -40px; /* expands frame width */
-  background:url("Untitled design (7).png") center/contain no-repeat;
-  pointer-events:none;
+.open-btn--lux::before {
+  content: "";
+  position: absolute;
+  inset: 0;             /* Full button coverage */
+  background: url("Untitled design (7).png") center/cover no-repeat;
+  pointer-events: none;
+  z-index: 0;           /* Behind text */
 }
+
+.open-btn__label {
+  position: relative;
+  z-index: 1;           /* Text above frame */
+  /* All existing text styles unchanged */
+}
+
     .open-btn__label{ position:relative; z-index:1; font-size:clamp(16px, 4vw, 20px); line-height:1; letter-spacing:.08em; font-weight:500; white-space:nowrap; padding:0 4px; background:linear-gradient(90deg, var(--gold-1) 0%, var(--gold-2) 18%, var(--gold-3) 35%, var(--gold-4) 50%, var(--gold-3) 65%, var(--gold-2) 82%, var(--gold-1) 100%); background-size:240% 100%; -webkit-background-clip:text; background-clip:text; color:transparent; animation:goldShift 4.5s ease-in-out infinite; text-shadow:0 0 10px rgba(255,220,150,.08); }
 
     .hero{ width:100%; min-height:calc(var(--vh) * 100); display:flex; align-items:center; justify-content:center; padding:28px 15px 28px 15px; scroll-margin-top:20px; opacity:0; }
@@ -570,6 +576,7 @@
   </script>
 </body>
 </html>
+
 
 
 
