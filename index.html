@@ -446,7 +446,7 @@
     <source src="music.mp3" type="audio/mpeg" />
   </audio>
 
-  <script>
+<script>
 document.addEventListener('DOMContentLoaded', function() {
   const EVENT = { title: "The Wedding of Tan Baksim & Try Kimly", details: "Request the honor of your presence on the auspicious occasion of the wedding reception.", locationName: "The Premier Center Sensok (Building D&E), Phnom Penh, Cambodia", startLocalISO: "2026-03-29T17:00:00+07:00", endLocalISO: "2026-03-29T19:00:00+07:00" };
   
@@ -470,61 +470,69 @@ document.addEventListener('DOMContentLoaded', function() {
   let musicStarted = false, lbCurrentIndex = 0;
   const thumbImages = thumbs.map(btn => btn.dataset.full);
   
+  // === BULLETPROOF SCROLL LOCK ===
+  function lockScroll() {
+    const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+    document.body.style.cssText = `
+      position: fixed;
+      top: ${-scrollY}px;
+      left: 0;
+      right: 0;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+    `;
+    document.documentElement.style.overflow = 'hidden';
+    return scrollY;
+  }
+  
+  function unlockScroll(scrollY) {
+    document.body.style.cssText = '';
+    document.documentElement.style.overflow = '';
+    window.scrollTo(0, scrollY);
+  }
+  
   // === ULTRA-FAST SEAMLESS LIGHTBOX ===
   function preloadNextImage() {
     const nextIdx = (lbCurrentIndex + 1) % thumbImages.length;
-    const img = new Image();
-    img.src = thumbImages[nextIdx];
+    const prevIdx = (lbCurrentIndex - 1 + thumbImages.length) % thumbImages.length;
+    new Image().src = thumbImages[nextIdx];
+    new Image().src = thumbImages[prevIdx];
   }
   
- function openLb(index) {
-  lbCurrentIndex = index;
-  lbImg.src = thumbImages[index];
-  lb.classList.add("is-open");
-  
-  // ✅ BULLETPROOF SCROLL LOCK
-  document.body.style.overflow = 'hidden';
-  document.documentElement.style.overflow = 'hidden';
-  document.body.style.position = 'fixed';
-  document.body.style.width = '100%';
-  
-  preloadNextImage();
-}
+  function openLb(index) {
+    lbCurrentIndex = index;
+    lbImg.src = thumbImages[index];
+    lb.classList.add("is-open");
+    const scrollY = lockScroll();
+    lb.dataset.scrollY = scrollY;
+    preloadNextImage();
+  }
   
   function slideToNext(direction) {
     const nextIndex = direction === 'next' ? 
       (lbCurrentIndex + 1) % thumbImages.length : 
       (lbCurrentIndex - 1 + thumbImages.length) % thumbImages.length;
     
-    // INSTANT switch - NO fade, NO delay
+    lbImg.style.transition = 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)';
     lbImg.style.opacity = '0';
     lbImg.style.transform = direction === 'next' ? 'translateX(-100%)' : 'translateX(100%)';
     
-    // Load new image instantly (pre-cached)
-    requestAnimationFrame(() => {
+    setTimeout(() => {
       lbCurrentIndex = nextIndex;
       lbImg.src = thumbImages[nextIndex];
-      
-      requestAnimationFrame(() => {
-        lbImg.style.transition = 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)';
-        lbImg.style.opacity = '1';
-        lbImg.style.transform = 'translateX(0)';
-      });
-    });
+    }, 125);
   }
   
- function closeLb() {
-  lb.classList.remove("is-open");
+  function closeLb() {
+    const scrollY = parseInt(lb.dataset.scrollY) || 0;
+    lb.classList.remove("is-open");
+    unlockScroll(scrollY);
+  }
   
-  // ✅ FULL SCROLL RESTORE
-  document.body.style.overflow = '';
-  document.documentElement.style.overflow = '';
-  document.body.style.position = '';
-  document.body.style.width = '';
-}
-  
-  // === PERFECTLY SMOOTH TOUCH SWIPE ===
+  // === FIXED TOUCH SWIPE (CORRECT DIRECTION) ===
   let touchStartX = 0, touchCurrentX = 0;
+  
   lb.addEventListener('touchstart', e => {
     touchStartX = e.touches[0].clientX;
     touchCurrentX = touchStartX;
@@ -532,48 +540,49 @@ document.addEventListener('DOMContentLoaded', function() {
   }, { passive: true });
   
   lb.addEventListener('touchmove', e => {
+    if (!lb.classList.contains('is-open')) return;
+    e.preventDefault();
     touchCurrentX = e.touches[0].clientX;
     const diff = touchStartX - touchCurrentX;
-    lbImg.style.transform = `translateX(${diff * 0.5}px)`;
+    lbImg.style.transform = `translateX(${diff}px)`;
   }, { passive: false });
   
   lb.addEventListener('touchend', e => {
     const diff = touchStartX - touchCurrentX;
-    if (Math.abs(diff) > 50) {
-      slideToNext(diff > 0 ? 'next' : 'prev');
+    if (Math.abs(diff) > 60) {
+      // ✅ FIXED: Swipe RIGHT (diff < 0) = NEXT image
+      // ✅ FIXED: Swipe LEFT (diff > 0) = PREV image  
+      slideToNext(diff > 0 ? 'prev' : 'next');
     } else {
-      lbImg.style.transition = 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)';
+      lbImg.style.transition = 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)';
       lbImg.style.transform = 'translateX(0)';
     }
-  }, { passive: true });
+  }, { passive: false });
   
-  // === EVENT HANDLERS ===
-  lbClose.onclick = e => { e.stopPropagation(); closeLb(); };
-  
-lb.onclick = function(e) {
-  if (e.target !== lb) return; // Ignore clicks on image/close button
-  
-  const x = e.clientX / window.innerWidth; // 0=left, 1=right
-  
-  // 👈 LEFT SIDE = PREVIOUS IMAGE
-  if (x < 0.3) slideToNext('prev');
-  
-  // 👉 RIGHT SIDE = NEXT IMAGE  
-  else if (x > 0.7) slideToNext('next');
-  
-  // 🖱️ MIDDLE = CLOSE
-  else closeLb();
-};
-
-  
-  thumbs.forEach((btn, idx) => {
-    btn.onclick = () => openLb(idx);
+  // === FIXED CLICK ZONES (Works ON IMAGE TOO) ===
+  lb.addEventListener('click', function(e) {
+    // Allow close button clicks
+    if (e.target.closest('.lb-close')) return;
+    
+    const rect = lb.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    
+    if (x < 0.35) {
+      slideToNext('prev');  // Left 35% = PREV
+    } else if (x > 0.65) {
+      slideToNext('next');  // Right 35% = NEXT
+    } else {
+      closeLb();            // Middle 30% = CLOSE
+    }
   });
   
+  // Image load handler
   lbImg.onload = () => {
     if (lb.classList.contains("is-open")) {
+      lbImg.style.transition = 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)';
       lbImg.style.opacity = '1';
       lbImg.style.transform = 'translateX(0)';
+      preloadNextImage();
     }
   };
   
@@ -635,21 +644,28 @@ lb.onclick = function(e) {
     } 
   };
   
-  document.onclick = e => { 
+  document.addEventListener('click', e => { 
     const a = e.target.closest('a[href^="#"]'); 
     if (!a) return; 
     e.preventDefault(); 
     document.querySelector(a.getAttribute("href"))?.scrollIntoView({ behavior: "smooth", block: "start" }); 
-  };
+  });
   
   setInterval(tickCountdown, 1000);
   document.getElementById("btnCalendar").onclick = () => { 
-    window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(EVENT.title)}&dates=${new Date(EVENT.startLocalISO).toISOString().replace(/-|:|\\.\\d\\d\\d/g,"")}/${new Date(EVENT.endLocalISO).toISOString().replace(/-|:|\\.\\d\\d\\d/g,"")}&details=${encodeURIComponent(EVENT.details)}&location=${encodeURIComponent(EVENT.locationName)}`, "_blank"); 
+    window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(EVENT.title)}&dates=${new Date(EVENT.startLocalISO).toISOString().replace(/-|:|\\\\.\\\\d\\\\d\\\\d/g,"")}/${new Date(EVENT.endLocalISO).toISOString().replace(/-|:|\\\\.\\\\d\\\\d\\\\d/g,"")}&details=${encodeURIComponent(EVENT.details)}&location=${encodeURIComponent(EVENT.locationName)}`, "_blank"); 
   };
+  
+  // Thumbnail clicks
+  thumbs.forEach((btn, idx) => {
+    btn.onclick = () => openLb(idx);
+  });
+  
+  lbClose.onclick = e => { e.stopPropagation(); closeLb(); };
 });
+</script>
 
-
-  </script>
 </body>
 </html>
+
 
