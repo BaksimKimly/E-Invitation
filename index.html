@@ -448,8 +448,15 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  const EVENT = { title: "The Wedding of Tan Baksim & Try Kimly", details: "Request the honor of your presence on the auspicious occasion of the wedding reception.", locationName: "The Premier Center Sensok (Building D&E), Phnom Penh, Cambodia", startLocalISO: "2026-03-29T17:00+07:00", endLocalISO: "2026-03-29T19:00:00+07:00" };
+  const EVENT = { 
+    title: "The Wedding of Tan Baksim & Try Kimly", 
+    details: "Request the honor of your presence on the auspicious occasion of the wedding reception.", 
+    locationName: "The Premier Center Sensok (Building D&E), Phnom Penh, Cambodia", 
+    startLocalISO: "2026-03-29T17:00+07:00", 
+    endLocalISO: "2026-03-29T19:00+07:00" 
+  };
   
+  // DOM elements
   const heroVideo = document.getElementById("heroVideo"),
         heroSection = document.querySelector(".hero"),
         openBtn = document.getElementById("openBtn"),
@@ -467,33 +474,31 @@ document.addEventListener('DOMContentLoaded', function() {
         lbClose = document.getElementById("lbClose"),
         thumbs = Array.from(document.querySelectorAll(".thumb"));
   
-  let musicStarted = false, lbCurrentIndex = 0, scrollY = 0;
+  let musicStarted = false, lbCurrentIndex = 0, scrollY = 0, isDragging = false, startX = 0;
   const thumbImages = thumbs.map(btn => btn.dataset.full);
   
-  // === PERFECT SCROLL LOCK ===
+  // === SCROLL LOCK ===
   function lockScroll() {
     scrollY = window.pageYOffset || document.documentElement.scrollTop;
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.left = '0';
-    document.body.style.right = '0';
-    document.body.style.width = '100%';
-    document.body.style.overflow = 'hidden';
+    document.body.style.cssText = `
+      position: fixed;
+      top: ${-scrollY}px;
+      left: 0;
+      right: 0;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+    `;
     document.documentElement.style.overflow = 'hidden';
   }
   
   function unlockScroll() {
-    document.body.style.position = '';
-    document.body.style.top = '';
-    document.body.style.left = '';
-    document.body.style.right = '';
-    document.body.style.width = '';
-    document.body.style.overflow = '';
+    document.body.style.cssText = '';
     document.documentElement.style.overflow = '';
     window.scrollTo(0, scrollY);
   }
   
-  // === ULTRA-SMOOTH LIGHTBOX ===
+  // === LIGHTBOX FUNCTIONS ===
   function preloadNextImage() {
     const nextIdx = (lbCurrentIndex + 1) % thumbImages.length;
     const prevIdx = (lbCurrentIndex - 1 + thumbImages.length) % thumbImages.length;
@@ -514,16 +519,14 @@ document.addEventListener('DOMContentLoaded', function() {
       (lbCurrentIndex + 1) % thumbImages.length : 
       (lbCurrentIndex - 1 + thumbImages.length) % thumbImages.length;
     
-    // Slide OUT current image
-    lbImg.style.transition = 'all 0.2s ease';
+    lbImg.style.transition = 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)';
     lbImg.style.opacity = '0';
-    lbImg.style.transform = direction === 'next' ? 'translateX(-25%)' : 'translateX(25%)';
+    lbImg.style.transform = direction === 'next' ? 'translateX(-100%)' : 'translateX(100%)';
     
     setTimeout(() => {
-      // Switch to new image
       lbCurrentIndex = nextIndex;
       lbImg.src = thumbImages[nextIndex];
-    }, 100);
+    }, 125);
   }
   
   function closeLb() {
@@ -531,85 +534,63 @@ document.addEventListener('DOMContentLoaded', function() {
     unlockScroll();
   }
   
-  // === FIXED TOUCH SWIPE (CORRECT DIRECTION) ===
-  let touchStartX = 0;
-  
-  // Touch START
+  // === PERFECT TOUCH SWIPE ===
   lb.addEventListener('touchstart', e => {
     if (!lb.classList.contains('is-open')) return;
-    touchStartX = e.touches[0].clientX;
+    isDragging = true;
+    startX = e.touches[0].clientX;
     lbImg.style.transition = 'none';
   }, { passive: true });
   
-  // Touch MOVE (live drag)
   lb.addEventListener('touchmove', e => {
-    if (!lb.classList.contains('is-open')) return;
+    if (!isDragging || !lb.classList.contains('is-open')) return;
     e.preventDefault();
-    const touchCurrentX = e.touches[0].clientX;
-    const diff = touchStartX - touchCurrentX;
+    const currentX = e.touches[0].clientX;
+    const diff = currentX - startX;
     lbImg.style.transform = `translateX(${diff}px)`;
   }, { passive: false });
   
-  // Touch END
   lb.addEventListener('touchend', e => {
-    if (!lb.classList.contains('is-open')) return;
-    const touchEndX = e.changedTouches[0].clientX;
-    const diff = touchStartX - touchEndX; // Positive = swipe LEFT
-    
-    if (Math.abs(diff) > 50) {
-      // ✅ SWIPE LEFT (diff > 0) = NEXT IMAGE
-      // ✅ SWIPE RIGHT (diff < 0) = PREVIOUS IMAGE
+    if (!isDragging) return;
+    isDragging = false;
+    const endX = e.changedTouches[0].clientX;
+    const diff = endX - startX;
+    if (Math.abs(diff) > 80) {
       slideToNext(diff > 0 ? 'next' : 'prev');
     } else {
-      lbImg.style.transition = 'all 0.2s ease';
+      lbImg.style.transition = 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)';
       lbImg.style.transform = 'translateX(0)';
     }
   }, { passive: false });
   
-  // === FIXED CLICK ZONES (Works on IMAGE + Background) ===
-  lb.addEventListener('click', function(e) {
-    // Ignore close button
-    if (e.target.closest('.lb-close')) return;
-    
-    // Get position relative to lightbox
-    const rect = lb.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / (rect.right - rect.left);
-    
-    // LEFT 30% = PREV, RIGHT 30% = NEXT, MIDDLE = CLOSE
-    if (x < 0.3) {
-      slideToNext('prev');
-    } else if (x > 0.7) {
-      slideToNext('next');
-    } else {
-      closeLb();
-    }
+  // === CLICK HANDLING - MIDDLE DOES NOTHING ===
+  lbImg.addEventListener('click', function(e) {
+    e.stopPropagation();
+    const rect = lbImg.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    if (x < 0.3) slideToNext('prev');
+    else if (x > 0.7) slideToNext('next');
+    // Middle 40% = NOTHING ✅
   });
   
-  // Image loaded
+  lb.addEventListener('click', function(e) {
+    if (e.target === lb) closeLb(); // Only background closes
+  });
+  
   lbImg.onload = () => {
     if (lb.classList.contains("is-open")) {
-      lbImg.style.transition = 'all 0.2s ease';
+      lbImg.style.transition = 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)';
       lbImg.style.opacity = '1';
       lbImg.style.transform = 'translateX(0)';
       preloadNextImage();
     }
   };
   
-  // Close button
-  lbClose.onclick = e => { 
-    e.stopPropagation(); 
-    closeLb(); 
-  };
+  // === EVENT HANDLERS ===
+  lbClose.onclick = e => { e.stopPropagation(); closeLb(); };
+  thumbs.forEach((btn, idx) => btn.onclick = () => openLb(idx));
   
-  // Thumbnail clicks
-  thumbs.forEach((btn, idx) => {
-    btn.onclick = e => {
-      e.preventDefault();
-      openLb(idx);
-    };
-  });
-  
-  // === REST OF YOUR CODE (unchanged) ===
+  // === UTILITY FUNCTIONS ===
   function setRealViewportHeight() { 
     document.documentElement.style.setProperty("--vh", `${window.innerHeight * 0.01}px`); 
   }
@@ -651,7 +632,7 @@ document.addEventListener('DOMContentLoaded', function() {
     moveBubble(document.querySelector(".dock a.active") || document.querySelector(".dock a")); 
   }
   
-  // INIT
+  // === INITIALIZATION ===
   setRealViewportHeight(); 
   tickCountdown(); 
   moveBubble(document.querySelector(".dock a.active"));
@@ -698,7 +679,9 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+
 </body>
 </html>
 when I scrolled side to side, scrolled/swip right it goes left it goes the opposite.
 And I cant use the click on the far right or left functinon on the img to go to other img
+
