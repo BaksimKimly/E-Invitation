@@ -477,13 +477,19 @@ document.addEventListener('DOMContentLoaded', function() {
     img.src = thumbImages[nextIdx];
   }
   
-  function openLb(index) {
-    lbCurrentIndex = index;
-    lbImg.src = thumbImages[index];
-    lb.classList.add("is-open");
-    document.body.style.overflow = "hidden";
-    preloadNextImage();
-  }
+ function openLb(index) {
+  lbCurrentIndex = index;
+  lbImg.src = thumbImages[index];
+  lb.classList.add("is-open");
+  
+  // ✅ BULLETPROOF SCROLL LOCK
+  document.body.style.overflow = 'hidden';
+  document.documentElement.style.overflow = 'hidden';
+  document.body.style.position = 'fixed';
+  document.body.style.width = '100%';
+  
+  preloadNextImage();
+}
   
   function slideToNext(direction) {
     const nextIndex = direction === 'next' ? 
@@ -507,10 +513,15 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  function closeLb() {
-    lb.classList.remove("is-open");
-    document.body.style.overflow = "";
-  }
+ function closeLb() {
+  lb.classList.remove("is-open");
+  
+  // ✅ FULL SCROLL RESTORE
+  document.body.style.overflow = '';
+  document.documentElement.style.overflow = '';
+  document.body.style.position = '';
+  document.body.style.width = '';
+}
   
   // === PERFECTLY SMOOTH TOUCH SWIPE ===
   let touchStartX = 0, touchCurrentX = 0;
@@ -539,13 +550,21 @@ document.addEventListener('DOMContentLoaded', function() {
   // === EVENT HANDLERS ===
   lbClose.onclick = e => { e.stopPropagation(); closeLb(); };
   
-  lb.onclick = e => {
-    if (e.target !== lb) return;
-    const x = e.clientX / window.innerWidth;
-    if (x < 0.3) slideToNext('prev');
-    else if (x > 0.7) slideToNext('next');
-    else closeLb();
-  };
+lb.onclick = function(e) {
+  if (e.target !== lb) return; // Ignore clicks on image/close button
+  
+  const x = e.clientX / window.innerWidth; // 0=left, 1=right
+  
+  // 👈 LEFT SIDE = PREVIOUS IMAGE
+  if (x < 0.3) slideToNext('prev');
+  
+  // 👉 RIGHT SIDE = NEXT IMAGE  
+  else if (x > 0.7) slideToNext('next');
+  
+  // 🖱️ MIDDLE = CLOSE
+  else closeLb();
+};
+
   
   thumbs.forEach((btn, idx) => {
     btn.onclick = () => openLb(idx);
@@ -633,3 +652,4 @@ document.addEventListener('DOMContentLoaded', function() {
   </script>
 </body>
 </html>
+
