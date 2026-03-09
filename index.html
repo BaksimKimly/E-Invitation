@@ -288,7 +288,6 @@
       scroll-margin-top:20px;
     }
 
-    /* Modifying the gallery section to go edge-to-edge */
     #gallery.section {
       padding-left: 0;
       padding-right: 0;
@@ -320,7 +319,6 @@
       margin:0 auto;
     }
 
-    /* Removed #gallery .content from this group */
     .hero .content,
     #location .content,
     #wishes .content{
@@ -345,22 +343,20 @@
       padding-bottom: max(120px, calc(env(safe-area-inset-bottom) + 90px));
     }
 
-    /* Removed #gallery .content from this group */
     #location .content,
     #wishes .content{
       margin-top:0;
       margin-bottom:0;
     }
 
-    /* --- DELETED GALLERY BORDER AND BLUR --- */
     #gallery .content {
       background: transparent !important;
       border: none !important;
       box-shadow: none !important;
       backdrop-filter: none !important;
       -webkit-backdrop-filter: none !important;
-      max-width: 100% !important; /* Allows grid to fill the page */
-      padding: 10px 5px !important; /* Minimal padding */
+      max-width: 100% !important; 
+      padding: 10px 5px !important; 
       margin-top: 0;
       margin-bottom: 0;
     }
@@ -588,20 +584,20 @@
       box-shadow:0 10px 40px rgba(0,0,0,0.8);
     }
 
-    /* --- SLIGHTLY BRIGHTER GOLD BUBBLE --- */
+    /* EXACT ORIGINAL GOLD BUBBLE RESTORED */
     .dock-bubble{
       position:absolute;
       top:6px;
       bottom:6px;
       left:0;
       width:0;
-      background:linear-gradient(135deg, rgba(255, 248, 195, 0.75) 0%, rgba(248, 230, 135, 0.50) 50%, rgba(215, 170, 85, 0.30) 100%);
-      border:1px solid rgba(255, 248, 195, 0.85);
+      background:linear-gradient(135deg, rgba(255, 241, 176, 0.65) 0%, rgba(246, 226, 122, 0.40) 50%, rgba(207, 163, 79, 0.20) 100%);
+      border:1px solid rgba(255, 241, 176, 0.70);
       border-radius:999px;
       z-index:1;
       box-shadow:
-        0 4px 18px rgba(255, 248, 195, 0.55),
-        inset 0 1px 6px rgba(255,255,255,0.40);
+        0 4px 15px rgba(255, 241, 176, 0.45),
+        inset 0 1px 4px rgba(255,255,255,0.25);
       transition:all 0.45s cubic-bezier(0.25, 1, 0.3, 1);
       transform:translateX(0);
       pointer-events:none;
