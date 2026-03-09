@@ -70,7 +70,14 @@
 
     button{ font:inherit; border:none; outline:none; background:none; -webkit-tap-highlight-color:transparent; cursor: pointer; }
 
-    #openingScreen{ position:fixed; inset:0; margin:0 auto; width:100%; max-width:500px; display:flex; align-items:center; justify-content:center; z-index:9999; opacity:1; overflow:hidden; background:transparent; min-height:calc(var(--vh) * 100); padding:20px 10px; transition:opacity .85s ease, visibility .85s ease; visibility:visible; }
+   #openingScreen {
+  position: fixed; inset: 0; margin: 0 auto; width: 100%; max-width: 500px;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999; opacity: 1; overflow: hidden;
+  min-height: 100svh; /* Better for mobile browsers */
+  padding: clamp(10px, 4vh, 30px) 15px; /* Responsive top/bottom space */
+  transition: opacity .85s ease, visibility .85s ease; visibility: visible;
+}
 
     #openingScreen.is-leaving{ opacity:0; visibility:hidden; pointer-events:none; }
     #openingScreen { 
@@ -86,33 +93,41 @@
 
     .opening-overlay{ position:absolute; inset:0; background:radial-gradient(70% 60% at 50% 30%, rgba(255,220,150,.05), rgba(0,0,0,.26)); pointer-events:none; }
 
-    .open-box{ text-align:center; color:white; width:100%; max-width:440px; z-index:2; animation:openPop .9s ease both; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0; transition:transform .85s cubic-bezier(.22,1,.36,1), opacity .65s ease; }
+    .open-box {
+  text-align: center; color: white; width: 100%; max-width: 440px;
+  z-index: 2; animation: openPop .9s ease both;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: clamp(5px, 2vh, 20px); /* Smart spacing between text/logo/button */
+}
 
     #openingScreen.is-leaving .open-box{ transform:translateY(-10px); opacity:0; }
 
     .open-sub{ font-family:"Great Vibes", cursive; font-size:clamp(24px, 6vw, 34px); line-height:1.2; letter-spacing:.02em; margin:0; padding:0 12px; background:linear-gradient(90deg, var(--gold-1) 0%, var(--gold-2) 18%, var(--gold-3) 35%, var(--gold-4) 50%, var(--gold-3) 65%, var(--gold-2) 82%, var(--gold-1) 100%); background-size:240% 100%; -webkit-background-clip:text; background-clip:text; color:transparent; animation:goldShift 4.5s ease-in-out infinite; }
 
-    .open-logo-wrap{ position:relative; display:inline-block; width:100%; max-width:420px; line-height:0; margin:35px 0; animation:logoFloat 3.8s ease-in-out infinite; }
+ .open-logo-wrap {
+  position: relative; display: inline-block; width: 100%; max-width: 420px;
+  margin: clamp(5px, 2vh, 25px) 0; /* Dynamic vertical margin */
+  animation: logoFloat 3.8s ease-in-out infinite;
+}
 
-    .open-logo{ width:100%; height:auto; object-fit:contain; user-select:none; filter:drop-shadow(0 18px 40px rgba(0,0,0,.55)) drop-shadow(0 0 8px rgba(255,241,176,.10)) drop-shadow(0 0 16px rgba(207,163,79,.08)); animation:logoGoldGlow 4.5s ease-in-out infinite; }
+   .open-logo {
+  width: 100%; height: auto;
+  max-height: 35vh !important; /* Forces logo to shrink on short phones */
+  object-fit: contain;
+  filter: drop-shadow(0 18px 40px rgba(0,0,0,.55));
+}
 
 .open-btn--lux {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 26px 60px;  /* More padding for frame inner space */
-  min-width: 250px;     /* Wider to match typical frame proportions */
+  padding: clamp(15px, 3vh, 22px) 50px; /* Reduced vertical padding */
+  min-width: 230px;
   border: none;
   background: none;
-  box-shadow: none;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
   cursor: pointer;
-  overflow: hidden;     /* Contains frame within button */
-  border-radius: 20px;  /* Optional: rounds frame edges */
 }
-
 .open-btn--lux::before {
   content: "";
   position: absolute;
@@ -720,6 +735,7 @@ lb.addEventListener('touchend', e => {
 </html>
 when I scrolled side to side, scrolled/swip right it goes left it goes the opposite.
 And I cant use the click on the far right or left functinon on the img to go to other img
+
 
 
 
