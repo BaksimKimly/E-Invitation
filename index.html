@@ -562,7 +562,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!isDragging) return;
     isDragging = false;
     const diff = e.changedTouches[0].clientX - startX;
-    const threshold = lbWidth * 0.09; 
+    const threshold = lbWidth * 0.10; 
 
     if (Math.abs(diff) > threshold) {
       if (diff > 0 && lbCurrentIndex > 0) {
@@ -701,5 +701,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </body>
 </html>
+
 
 
