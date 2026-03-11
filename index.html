@@ -41,7 +41,7 @@
       background:#080604 radial-gradient(circle at 50% 50%, #1c140a 0%, #060402 100%);
       color:var(--fg);
       overflow-x:hidden;
-      scroll-behavior:smooth;
+      /* REMOVED 'scroll-behavior: smooth' from here to fix the jump bug! */
       -webkit-text-size-adjust:100%;
       width:100%;
       min-height:100svh;
@@ -170,7 +170,7 @@
 
     .grid::-webkit-scrollbar { display: none; }
 
-    .thumb { border: 1px solid rgba(255, 255, 255, 0.16); padding: 0; border-radius: 6px; overflow: hidden; cursor: pointer; background: rgba(0, 0, 0, 0.4); position: relative; transform: translateY(24px); opacity: 0; transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.6s ease, box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease; width: 100%; height: 100%; box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+    .thumb { border: 1px solid rgba(255, 255, 255, 0.16); padding: 0; border-radius: 6px; overflow: hidden; cursor: pointer; background: rgba(0, 0, 0, 0.4); position: relative; transform: translateY(30px); opacity: 0; transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.6s ease, box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease; width: 100%; height: 100%; box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
 
     .thumb.show { transform: translateY(0); opacity: 1; }
 
@@ -293,7 +293,6 @@
 
     .lb-track { display: flex; width: 100%; height: 100%; align-items: center; will-change: transform; }
 
-    /* REMOVED PADDING HERE to eliminate the black gap between images */
     .lb-track img { flex: 0 0 100%; width: 100%; max-width: 500px; max-height: 88vh; object-fit: contain; padding: 0; user-select: none; -webkit-user-drag: none; pointer-events: auto; }
 
     @media (max-width:420px){ .pill{ min-width:145px; padding:10px 14px; font-size:13px; } .countdown{ gap:8px; } .cd{ padding:12px 4px 10px; } .cd b{ font-size:clamp(18px, 6vw, 28px); } }
@@ -495,7 +494,7 @@ document.addEventListener('DOMContentLoaded', function() {
     lbTrack.appendChild(img);
   });
 
-  // === SCROLL LOCK ===
+  // === SCROLL LOCK (FIXED JUMP BUG) ===
   function lockScroll() {
     scrollY = window.pageYOffset || document.documentElement.scrollTop;
     document.body.style.cssText = `position: fixed; top: ${-scrollY}px; left: 0; right: 0; width: 100%; height: 100vh; overflow: hidden;`;
@@ -503,17 +502,11 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   function unlockScroll() {
+    // Because we removed scroll-behavior: smooth from CSS, we no longer need the weird setTimeout fix!
+    // It will snap back instantly and perfectly.
     document.body.style.cssText = '';
     document.documentElement.style.overflow = '';
-    
-    // TEMPORARILY disable smooth scrolling so it doesn't jump down from the top
-    document.documentElement.style.scrollBehavior = 'auto';
     window.scrollTo(0, scrollY);
-    
-    // Re-enable smooth scrolling a split second later
-    setTimeout(() => {
-      document.documentElement.style.scrollBehavior = 'smooth';
-    }, 10);
   }
   
   // === INSTAGRAM-LIKE SWIPE LOGIC ===
@@ -531,8 +524,7 @@ document.addEventListener('DOMContentLoaded', function() {
     lbCurrentIndex = index;
     lb.classList.add("is-open");
     lockScroll();
-    updateTrackPosition(false); // Snap to correct slide instantly without animation
-    // Force a browser reflow so transition doesn't accidentally trigger
+    updateTrackPosition(false); 
     lbTrack.offsetHeight; 
   }
 
@@ -541,68 +533,54 @@ document.addEventListener('DOMContentLoaded', function() {
     unlockScroll();
   }
 
-  // Touch handlers for the track
   lb.addEventListener('touchstart', e => {
     if (!lb.classList.contains('is-open')) return;
     isDragging = true;
     startX = e.touches[0].clientX;
-    lbWidth = lb.offsetWidth; // Get the active width of the lightbox container
-    lbTrack.style.transition = 'none'; // Disable transition so it tracks finger perfectly
+    lbWidth = lb.offsetWidth; 
+    lbTrack.style.transition = 'none'; 
   }, { passive: true });
 
   lb.addEventListener('touchmove', e => {
     if (!isDragging || !lb.classList.contains('is-open')) return;
-    e.preventDefault(); // Stop page from scrolling vertically
-    
+    e.preventDefault(); 
     const currentX = e.touches[0].clientX;
     const diff = currentX - startX;
     
-    // Add resistance/bounce at the very first and very last image
     let dragOffset = diff;
     if (lbCurrentIndex === 0 && diff > 0) {
       dragOffset = diff * 0.3; 
     } else if (lbCurrentIndex === thumbImages.length - 1 && diff < 0) {
       dragOffset = diff * 0.3;
     }
-
-    // Move track: base percentage offset + pixel drag offset
     lbTrack.style.transform = `translateX(calc(-${lbCurrentIndex * 100}% + ${dragOffset}px))`;
   }, { passive: false });
 
   lb.addEventListener('touchend', e => {
     if (!isDragging) return;
     isDragging = false;
-    
     const diff = e.changedTouches[0].clientX - startX;
-    const threshold = lbWidth * 0.15; // Require 15% screen swipe to change slides
+    const threshold = lbWidth * 0.15; 
 
     if (Math.abs(diff) > threshold) {
       if (diff > 0 && lbCurrentIndex > 0) {
-        lbCurrentIndex--; // Swiped Right -> Go Prev
+        lbCurrentIndex--; 
       } else if (diff < 0 && lbCurrentIndex < thumbImages.length - 1) {
-        lbCurrentIndex++; // Swiped Left -> Go Next
+        lbCurrentIndex++; 
       }
     }
-    
-    // Snap to the new (or current) slide
     updateTrackPosition(true);
   }, { passive: false });
 
-  // Handle taps on edges (desktop or mobile) to swap slides
   lb.addEventListener('click', function(e) {
-    // If clicked on the dark background or track background, close it
     if (e.target === lb || e.target === lbTrack) {
       closeLb();
       return;
     }
-    
-    // If clicked exactly on an image
     if (e.target.tagName === 'IMG') {
       e.stopPropagation();
       const rect = e.target.getBoundingClientRect();
       const x = (e.clientX - rect.left) / rect.width;
-      
-      // Tap left 30% -> Prev, Tap right 30% -> Next
       if (x < 0.3 && lbCurrentIndex > 0) {
         lbCurrentIndex--;
         updateTrackPosition(true);
@@ -670,9 +648,22 @@ document.addEventListener('DOMContentLoaded', function() {
     }, { rootMargin: "-50% 0px -50% 0px", threshold: 0 });
     sections.forEach(sec => scrollObserver.observe(sec));
     
+    // ADDED: Staggered loading for the photo gallery!
+    let galleryDelay = 0;
     const galleryObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => entry.isIntersecting && entry.target.classList.add("show"));
-    }, { threshold: 0.15 });
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            entry.target.classList.add("show");
+          }, galleryDelay);
+          galleryDelay += 80; // Adds 80ms delay between each photo loading
+          galleryObserver.unobserve(entry.target);
+        }
+      });
+      // Reset the delay so future scrolls don't take forever
+      setTimeout(() => { galleryDelay = 0; }, 100); 
+    }, { threshold: 0.1 });
+    
     thumbs.forEach(thumb => galleryObserver.observe(thumb));
   }
   
@@ -684,19 +675,20 @@ document.addEventListener('DOMContentLoaded', function() {
     navDock.classList.add("is-visible"); 
   };
   
-  openingScreen.ontransitionend = e => { 
-    if (e.propertyName === "opacity" && openingScreen.classList.contains("is-leaving")) { 
-      openingScreen.style.display = "none"; 
-      unlockPageScroll(); 
-    } 
-  };
-  
+  // JS handles smooth scrolling perfectly now!
   document.addEventListener('click', e => { 
     const a = e.target.closest('a[href^="#"]'); 
     if (!a) return; 
     e.preventDefault(); 
     document.querySelector(a.getAttribute("href"))?.scrollIntoView({ behavior: "smooth", block: "start" }); 
   });
+  
+  openingScreen.ontransitionend = e => { 
+    if (e.propertyName === "opacity" && openingScreen.classList.contains("is-leaving")) { 
+      openingScreen.style.display = "none"; 
+      unlockPageScroll(); 
+    } 
+  };
   
   setInterval(tickCountdown, 1000);
   document.getElementById("btnCalendar").onclick = () => { 
