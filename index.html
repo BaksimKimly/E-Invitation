@@ -293,7 +293,8 @@
 
     .lb-track { display: flex; width: 100%; height: 100%; align-items: center; will-change: transform; }
 
-    .lb-track img { flex: 0 0 100%; width: 100%; max-width: 500px; max-height: 88vh; object-fit: contain; padding: 0 10px; user-select: none; -webkit-user-drag: none; pointer-events: auto; }
+    /* REMOVED PADDING HERE to eliminate the black gap between images */
+    .lb-track img { flex: 0 0 100%; width: 100%; max-width: 500px; max-height: 88vh; object-fit: contain; padding: 0; user-select: none; -webkit-user-drag: none; pointer-events: auto; }
 
     @media (max-width:420px){ .pill{ min-width:145px; padding:10px 14px; font-size:13px; } .countdown{ gap:8px; } .cd{ padding:12px 4px 10px; } .cd b{ font-size:clamp(18px, 6vw, 28px); } }
 
@@ -479,7 +480,7 @@ document.addEventListener('DOMContentLoaded', function() {
         elMins = document.getElementById("dMins"),
         elSecs = document.getElementById("dSecs"),
         lb = document.getElementById("lightbox"),
-        lbTrack = document.getElementById("lbTrack"), // Using new track
+        lbTrack = document.getElementById("lbTrack"),
         lbClose = document.getElementById("lbClose"),
         thumbs = Array.from(document.querySelectorAll(".thumb"));
   
@@ -504,7 +505,15 @@ document.addEventListener('DOMContentLoaded', function() {
   function unlockScroll() {
     document.body.style.cssText = '';
     document.documentElement.style.overflow = '';
+    
+    // TEMPORARILY disable smooth scrolling so it doesn't jump down from the top
+    document.documentElement.style.scrollBehavior = 'auto';
     window.scrollTo(0, scrollY);
+    
+    // Re-enable smooth scrolling a split second later
+    setTimeout(() => {
+      document.documentElement.style.scrollBehavior = 'smooth';
+    }, 10);
   }
   
   // === INSTAGRAM-LIKE SWIPE LOGIC ===
