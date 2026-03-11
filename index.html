@@ -1,3 +1,12 @@
+Got it! The issues you are describing were all tied to that "staggered loading" animation I added earlier.
+
+Because the code was locking the scroll position when you opened the image, closing it made the browser think you were scrolling down the page again—which caused the photos to replay their "fade-in" animation, making it look glitchy and stuttery.
+
+I have completely removed that scroll animation so the photos are just perfectly static and always there. I also added a command to instantly hide the Quick Nav dock when the image opens, and smoothly bring it back when you close it.
+
+Here is the updated, seamless code:
+
+```html
 <!doctype html>
 <html lang="en" class="scroll-lock">
 <head>
@@ -171,14 +180,11 @@
 
     .grid::-webkit-scrollbar { display: none; }
 
-    .thumb { border: 1px solid rgba(255, 255, 255, 0.16); padding: 0; border-radius: 6px; overflow: hidden; cursor: pointer; background: rgba(0, 0, 0, 0.4); position: relative; transform: translateY(30px); opacity: 0; transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.6s ease, box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease; width: 100%; height: 100%; box-shadow: 0 6px 20px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; }
+    /* REMOVED the translate/opacity animations from here! Images stay perfectly still. */
+    .thumb { border: 1px solid rgba(255, 255, 255, 0.16); padding: 0; border-radius: 6px; overflow: hidden; cursor: pointer; background: rgba(0, 0, 0, 0.4); position: relative; transition: box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease; width: 100%; height: 100%; box-shadow: 0 6px 20px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; }
 
-    .thumb.show { transform: translateY(0); opacity: 1; }
-
-    /* CHANGED BACK TO COVER so it fills the squares */
     .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 0; transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), filter 0.4s ease; filter: brightness(0.9) contrast(1.05); }
 
-    /* NEW CODE: Shifts the crop upwards to protect the faces and hair! */
     .thumb:nth-child(1) img, 
     .thumb:nth-child(2) img, 
     .thumb:nth-child(3) img, 
@@ -220,7 +226,7 @@
       /* HIDE BY DEFAULT */
       opacity: 0; 
       visibility: hidden; 
-      transition: opacity 0.8s ease, visibility 0.8s ease; 
+      transition: opacity 0.5s ease, visibility 0.5s ease; 
     }
 
     /* SHOW WHEN ACTIVE */
@@ -507,7 +513,7 @@ document.addEventListener('DOMContentLoaded', function() {
     lbTrack.appendChild(img);
   });
 
-  // === SCROLL LOCK (FIXED JUMP BUG) ===
+  // === SCROLL LOCK ===
   function lockScroll() {
     scrollY = window.pageYOffset || document.documentElement.scrollTop;
     document.body.style.cssText = `position: fixed; top: ${-scrollY}px; left: 0; right: 0; width: 100%; height: 100vh; overflow: hidden;`;
@@ -515,8 +521,6 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   function unlockScroll() {
-    // Because we removed scroll-behavior: smooth from CSS, we no longer need the weird setTimeout fix!
-    // It will snap back instantly and perfectly.
     document.body.style.cssText = '';
     document.documentElement.style.overflow = '';
     window.scrollTo(0, scrollY);
@@ -536,6 +540,10 @@ document.addEventListener('DOMContentLoaded', function() {
   function openLb(index) {
     lbCurrentIndex = index;
     lb.classList.add("is-open");
+    
+    // NEW: Hide the quick nav dock when image is clicked
+    navDock.classList.remove("is-visible");
+    
     lockScroll();
     updateTrackPosition(false); 
     lbTrack.offsetHeight; 
@@ -543,6 +551,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function closeLb() {
     lb.classList.remove("is-open");
+    
+    // NEW: Bring the quick nav dock back when quitting
+    navDock.classList.add("is-visible");
+    
     unlockScroll();
   }
 
@@ -574,7 +586,6 @@ document.addEventListener('DOMContentLoaded', function() {
     isDragging = false;
     const diff = e.changedTouches[0].clientX - startX;
     
-    // CHANGED THE THRESHOLD HERE to make swiping extremely sensitive
     const threshold = lbWidth * 0.05; 
 
     if (Math.abs(diff) > threshold) {
@@ -663,23 +674,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }, { rootMargin: "-50% 0px -50% 0px", threshold: 0 });
     sections.forEach(sec => scrollObserver.observe(sec));
     
-    // ADDED: Staggered loading for the photo gallery!
-    let galleryDelay = 0;
-    const galleryObserver = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          setTimeout(() => {
-            entry.target.classList.add("show");
-          }, galleryDelay);
-          galleryDelay += 80; // Adds 80ms delay between each photo loading
-          galleryObserver.unobserve(entry.target);
-        }
-      });
-      // Reset the delay so future scrolls don't take forever
-      setTimeout(() => { galleryDelay = 0; }, 100); 
-    }, { threshold: 0.1 });
-    
-    thumbs.forEach(thumb => galleryObserver.observe(thumb));
+    // THE BUGGY GALLERY SCROLL ANIMATION HAS BEEN COMPLETELY REMOVED FROM HERE!
   }
   
   openBtn.onclick = () => { 
@@ -714,3 +709,5 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </body>
 </html>
+
+```
