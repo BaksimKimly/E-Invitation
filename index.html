@@ -407,40 +407,39 @@
 
     .pillrow{
       display:grid;
-      grid-template-columns:repeat(2, 1fr);
+      grid-template-columns:repeat(4, 1fr);
       gap:10px;
       margin-top:18px;
       width:100%;
     }
 
     .pill{
-      display:inline-flex;
-      align-items:center;
-      justify-content:flex-start;
-      gap:10px;
-      padding:12px 14px;
-      min-height:58px;
-      border-radius:999px;
-      border:1px solid rgba(255,215,150,.26);
-      background:rgba(255,255,255,.08);
-      cursor:pointer;
-      user-select:none;
-      transition:transform .16s ease, background .16s ease, border-color .16s ease;
-      font-size:clamp(12px, 3vw, 15px);
-      color:rgba(255,255,255,.9);
-      font-family:"Cormorant Garamond", serif;
-      white-space:nowrap;
-      text-align:left;
-      width:100%;
-    }
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
 
-    .pill-icon{
-      width:30px;
-      height:30px;
-      object-fit:contain;
-      display:block;
-      flex-shrink:0;
-      filter: invert(72%) sepia(54%) saturate(452%) hue-rotate(353deg) brightness(92%) contrast(88%);
+  padding:14px 10px;
+  min-height:90px;
+
+  border-radius:18px;
+  border:1px solid rgba(255,215,150,.26);
+  background:rgba(255,255,255,.08);
+
+  cursor:pointer;
+  transition:transform .16s ease, background .16s ease, border-color .16s ease;
+
+  font-size:14px;
+  color:rgba(255,255,255,.9);
+  text-align:center;
+}
+
+  .pill-icon{
+    width:34px;
+    height:34px;
+    object-fit:contain;
+    display:block;
     }
 
     .pill span{
@@ -1518,3 +1517,4 @@ document.addEventListener('DOMContentLoaded', function() {
 </body>
 
 </html>
+
