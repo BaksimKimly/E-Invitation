@@ -403,6 +403,8 @@
       object-fit:contain;
       display:block;
       flex-shrink:0;
+      /* This filter turns pure black into a warm gold color */
+      filter: invert(72%) sepia(54%) saturate(452%) hue-rotate(353deg) brightness(92%) contrast(88%);
     }
 
     .pill span{
@@ -1428,6 +1430,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </body>
 
 </html>
+
 
 
 
