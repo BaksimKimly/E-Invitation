@@ -405,59 +405,62 @@
       line-height:1.6;
     }
 
-    .pillrow{
-      display:flex;
-      justify-content:center;
-      gap:12px;
-      margin-top:22px;
-      flex-wrap:wrap;
-    }
+   .pillrow{
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  margin-top:28px;   /* increased spacing */
+  flex-wrap:wrap;
+}
+.pill,
+.pill span{
+  color:rgba(255,245,225,.92) !important;
+}
+.pill{
+  display:flex !important;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  width:88px;
+  height:56px;
+  padding:6px 6px;
+  border-radius:20px;
+  border:1px solid rgba(255,235,190,.18);
+  background:rgba(255,255,255,.045);
+  backdrop-filter:blur(4px);
+  -webkit-backdrop-filter:blur(4px);
+  cursor:pointer;
+  transition:transform .16s ease, background .16s ease, border-color .16s ease;
+}
 
-    .pill,
-    .pill span{
-      color:#fff3d6;
-    }
+.pill:hover{
+  transform:translateY(-1px);
+  background:rgba(255,255,255,.07);
+  border-color:rgba(255,235,190,.28);
+  box-shadow:0 8px 20px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.06);
+}
 
-    .pill{
-      display:flex !important;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      text-align:center;
-      width:78px;
-      height:56px;
-      padding:6px 6px;
-      border-radius:16px;
-      border:1px solid rgba(255,235,190,.28);
-      background:rgba(60,40,20,.45);
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 8px 22px rgba(0,0,0,.18);
-      backdrop-filter:blur(12px);
-      -webkit-backdrop-filter:blur(12px);
-      cursor:pointer;
-      transition:transform .16s ease, background .16s ease, border-color .16s ease, box-shadow .16s ease;
-    }
+.pill-icon{
+  width:26px;
+  height:26px;
+  object-fit:contain;
+  margin-bottom:6px;
+}
 
-    .pill:hover{
+.pill span{
+  display:block;
+  width:100%;
+  text-align:center;
+  font-size:10px;
+  line-height:1.1;
+  white-space:nowrap;
+}
+
+    .pill:hover, .btn:hover{
       transform:translateY(-1px);
-      background:rgba(80,55,28,.55);
-      border-color:rgba(255,235,190,.30);
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 8px 22px rgba(0,0,0,.18);
-    }
-
-    .pill-icon{
-      width:26px;
-      height:26px;
-      object-fit:contain;
-      margin-bottom:6px;
-    }
-
-    .pill span{
-      display:block;
-      width:100%;
-      text-align:center;
-      font-size:10px;
-      line-height:1.1;
-      white-space:nowrap;
+      background:rgba(255,255,255,.13);
+      border-color:rgba(255,215,150,.36);
     }
 
     .btn{
@@ -474,12 +477,6 @@
       font-family:"Cormorant Garamond", serif;
       width:100%;
       max-width:250px;
-    }
-
-    .btn:hover{
-      transform:translateY(-1px);
-      background:rgba(255,255,255,.13);
-      border-color:rgba(255,215,150,.36);
     }
 
     .section-title{
@@ -513,10 +510,8 @@
       padding:14px 6px 12px;
       border-radius:16px;
       border:1px solid rgba(255,235,190,.28);
-      background:rgba(60,40,20,.45);
+      background:rgba(255,255,255,.09);
       box-shadow:inset 0 1px 0 rgba(255,255,255,.06), 0 8px 22px rgba(0,0,0,.18);
-      backdrop-filter:blur(12px);
-      -webkit-backdrop-filter:blur(12px);
     }
 
     .cd b{
@@ -580,18 +575,38 @@
     .thumb:nth-child(1) img,
     .thumb:nth-child(3) img,
     .thumb:nth-child(12) img{
-      object-position:center 5%;
+      object-position: center 5%;
     }
-    .thumb:nth-child(13) img{ object-position:center 60%; }
-    .thumb:nth-child(2) img{ object-position:60% 15%; }
-    .thumb:nth-child(4) img{ object-position:center 15%; }
-    .thumb:nth-child(5) img{ object-position:10% center; }
-    .thumb:nth-child(6) img{ object-position:90% center; }
-    .thumb:nth-child(7) img{ object-position:center 10%; }
-    .thumb:nth-child(8) img{ object-position:center 30%; }
-    .thumb:nth-child(11) img{ object-position:center 15%; }
-    .thumb:nth-child(14) img{ object-position:center 10%; }
-    .thumb:nth-child(15) img{ object-position:center 15%; }
+    .thumb:nth-child(13) img{
+      object-position: center 60%;
+    }
+    .thumb:nth-child(2) img{
+      object-position: 60% 15%;
+    }
+    .thumb:nth-child(4) img{
+      object-position: center 15%;
+    }
+    .thumb:nth-child(5) img{
+      object-position: 10% center;
+    }
+    .thumb:nth-child(6) img{
+      object-position: 90% center;
+    }
+    .thumb:nth-child(7) img{
+      object-position: center 10%;
+    }
+    .thumb:nth-child(8) img{
+      object-position: center 30%;
+    }
+    .thumb:nth-child(11) img{
+      object-position: center 15%;
+    }
+    .thumb:nth-child(14) img{
+      object-position: center 10%;
+    }
+    .thumb:nth-child(15) img{
+      object-position: center 15%;
+    }
 
     .thumb:hover{
       border-color:rgba(255, 255, 255, 0.4);
@@ -633,7 +648,6 @@
       background:rgba(20, 16, 12, 0.55);
       border:1px solid rgba(255, 215, 150, 0.2);
       backdrop-filter:blur(20px) saturate(150%);
-      -webkit-backdrop-filter:blur(20px) saturate(150%);
       z-index:9000;
       width:90%;
       max-width:380px;
@@ -1016,38 +1030,28 @@
       pointer-events:auto;
     }
 
-    @supports not ((backdrop-filter: blur(12px)) or (-webkit-backdrop-filter: blur(12px))) {
-      .pill,
-      .cd,
-      .content,
-      .dock,
-      .opening-glass,
-      .lb-close {
-        background:rgba(35,24,12,.88) !important;
-      }
-    }
+   @media (max-width:420px){
+  .pillrow{
+    gap:8px;
+    margin-top:16px;
+  }
 
-    @media (max-width:420px){
-      .pillrow{
-        gap:8px;
-        margin-top:16px;
-      }
+  .pill{
+    width:78px;
+    height:52px;
+    border-radius:18px;
+  }
 
-      .pill{
-        width:72px;
-        height:52px;
-        border-radius:16px;
-      }
+  .pill-icon{
+    width:22px;
+    height:22px;
+    margin-bottom:3px;
+  }
 
-      .pill-icon{
-        width:22px;
-        height:22px;
-        margin-bottom:3px;
-      }
-
-      .pill span{
-        font-size:8.5px;
-      }
+  .pill span{
+    font-size:8.5px;
+  }
+}
 
       .countdown{ gap:8px; }
       .cd{ padding:12px 4px 10px; }
@@ -1238,7 +1242,7 @@
     </div>
   </div>
 
-  <audio id="bgMusic" preload="auto" loop playsinline webkit-playsinline>
+  <audio id="bgMusic" preload="auto" loop>
     <source src="music.mp3" type="audio/mpeg" />
   </audio>
 
@@ -1397,29 +1401,10 @@ document.addEventListener('DOMContentLoaded', function() {
     document.documentElement.style.setProperty("--vh", `${window.innerHeight * 0.01}px`);
   }
 
-  function ensureMusicPlayback() {
+  function startMusicOnce() {
     if (musicStarted) return;
-
-    audio.volume = 1;
-    audio.muted = false;
-    audio.playsInline = true;
-
-    const tryPlay = () => {
-      audio.play()
-        .then(() => {
-          musicStarted = true;
-        })
-        .catch((err) => {
-          console.log("Audio play blocked:", err);
-        });
-    };
-
-    if (audio.readyState >= 2) {
-      tryPlay();
-    } else {
-      audio.load();
-      audio.addEventListener("canplaythrough", tryPlay, { once: true });
-    }
+    musicStarted = true;
+    audio.play().catch(() => {});
   }
 
   function moveBubble(targetLink) {
@@ -1467,7 +1452,6 @@ document.addEventListener('DOMContentLoaded', function() {
     heroSection.classList.add("hero-reveal");
     navDock.classList.add("is-visible");
     unlockPageScroll();
-
     heroVideo?.play().catch(() => {});
 
     setTimeout(() => {
@@ -1496,8 +1480,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   openBtn.onclick = () => {
-    ensureMusicPlayback();
-
+    startMusicOnce();
     openingScreen.classList.add("is-leaving");
 
     setTimeout(() => {
@@ -1519,7 +1502,10 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
   transitionVideo.addEventListener("ended", showMainContent);
-  transitionVideo.addEventListener("error", showMainContent);
+
+  transitionVideo.addEventListener("error", () => {
+    showMainContent();
+  });
 
   document.addEventListener('click', e => {
     const a = e.target.closest('a[href^="#"]');
@@ -1545,16 +1531,8 @@ document.addEventListener('DOMContentLoaded', function() {
       "_blank"
     );
   };
-
-  ["touchstart", "click"].forEach(evt => {
-    document.addEventListener(evt, () => {
-      if (!musicStarted && hasOpenedInvitation) {
-        ensureMusicPlayback();
-      }
-    }, { passive: true });
-  });
 });
 </script>
 
 </body>
-</html>
+</html>make the icon box smaller to fit well for the body of the content 
