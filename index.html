@@ -418,31 +418,31 @@
       color:#fff3d6;
     }
 
-  .pill{
-  display:flex !important;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  width:78px;
-  height:56px;
-  padding:6px 6px;
-  border-radius:16px;
-  border:1px solid rgba(255,235,190,.28);
-  background:rgba(255,255,255,.09);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.06), 0 8px 22px rgba(0,0,0,.18);
-  backdrop-filter:blur(12px);
-  -webkit-backdrop-filter:blur(12px);
-  cursor:pointer;
-  transition:transform .16s ease, background .16s ease, border-color .16s ease, box-shadow .16s ease;
-}
+    .pill{
+      display:flex !important;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      width:78px;
+      height:56px;
+      padding:6px 6px;
+      border-radius:16px;
+      border:1px solid rgba(255,235,190,.28);
+      background:rgba(60,40,20,.45);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 8px 22px rgba(0,0,0,.18);
+      backdrop-filter:blur(12px);
+      -webkit-backdrop-filter:blur(12px);
+      cursor:pointer;
+      transition:transform .16s ease, background .16s ease, border-color .16s ease, box-shadow .16s ease;
+    }
 
-   .pill:hover{
-  transform:translateY(-1px);
-  background:rgba(255,255,255,.11);
-  border-color:rgba(255,235,190,.30);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.06), 0 8px 22px rgba(0,0,0,.18);
-}
+    .pill:hover{
+      transform:translateY(-1px);
+      background:rgba(80,55,28,.55);
+      border-color:rgba(255,235,190,.30);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 8px 22px rgba(0,0,0,.18);
+    }
 
     .pill-icon{
       width:26px;
@@ -513,8 +513,10 @@
       padding:14px 6px 12px;
       border-radius:16px;
       border:1px solid rgba(255,235,190,.28);
-      background:rgba(255,255,255,.09);
+      background:rgba(60,40,20,.45);
       box-shadow:inset 0 1px 0 rgba(255,255,255,.06), 0 8px 22px rgba(0,0,0,.18);
+      backdrop-filter:blur(12px);
+      -webkit-backdrop-filter:blur(12px);
     }
 
     .cd b{
@@ -631,6 +633,7 @@
       background:rgba(20, 16, 12, 0.55);
       border:1px solid rgba(255, 215, 150, 0.2);
       backdrop-filter:blur(20px) saturate(150%);
+      -webkit-backdrop-filter:blur(20px) saturate(150%);
       z-index:9000;
       width:90%;
       max-width:380px;
@@ -1013,6 +1016,17 @@
       pointer-events:auto;
     }
 
+    @supports not ((backdrop-filter: blur(12px)) or (-webkit-backdrop-filter: blur(12px))) {
+      .pill,
+      .cd,
+      .content,
+      .dock,
+      .opening-glass,
+      .lb-close {
+        background:rgba(35,24,12,.88) !important;
+      }
+    }
+
     @media (max-width:420px){
       .pillrow{
         gap:8px;
@@ -1224,7 +1238,7 @@
     </div>
   </div>
 
-  <audio id="bgMusic" preload="auto" loop>
+  <audio id="bgMusic" preload="auto" loop playsinline webkit-playsinline>
     <source src="music.mp3" type="audio/mpeg" />
   </audio>
 
@@ -1383,10 +1397,29 @@ document.addEventListener('DOMContentLoaded', function() {
     document.documentElement.style.setProperty("--vh", `${window.innerHeight * 0.01}px`);
   }
 
-  function startMusicOnce() {
+  function ensureMusicPlayback() {
     if (musicStarted) return;
-    musicStarted = true;
-    audio.play().catch(() => {});
+
+    audio.volume = 1;
+    audio.muted = false;
+    audio.playsInline = true;
+
+    const tryPlay = () => {
+      audio.play()
+        .then(() => {
+          musicStarted = true;
+        })
+        .catch((err) => {
+          console.log("Audio play blocked:", err);
+        });
+    };
+
+    if (audio.readyState >= 2) {
+      tryPlay();
+    } else {
+      audio.load();
+      audio.addEventListener("canplaythrough", tryPlay, { once: true });
+    }
   }
 
   function moveBubble(targetLink) {
@@ -1434,6 +1467,7 @@ document.addEventListener('DOMContentLoaded', function() {
     heroSection.classList.add("hero-reveal");
     navDock.classList.add("is-visible");
     unlockPageScroll();
+
     heroVideo?.play().catch(() => {});
 
     setTimeout(() => {
@@ -1462,7 +1496,8 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   openBtn.onclick = () => {
-    startMusicOnce();
+    ensureMusicPlayback();
+
     openingScreen.classList.add("is-leaving");
 
     setTimeout(() => {
@@ -1484,10 +1519,7 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
   transitionVideo.addEventListener("ended", showMainContent);
-
-  transitionVideo.addEventListener("error", () => {
-    showMainContent();
-  });
+  transitionVideo.addEventListener("error", showMainContent);
 
   document.addEventListener('click', e => {
     const a = e.target.closest('a[href^="#"]');
@@ -1513,6 +1545,14 @@ document.addEventListener('DOMContentLoaded', function() {
       "_blank"
     );
   };
+
+  ["touchstart", "click"].forEach(evt => {
+    document.addEventListener(evt, () => {
+      if (!musicStarted && hasOpenedInvitation) {
+        ensureMusicPlayback();
+      }
+    }, { passive: true });
+  });
 });
 </script>
 
