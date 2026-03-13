@@ -405,57 +405,47 @@
       line-height:1.6;
     }
 
-   .pillrow{
+    .pillrow{
+      display:grid;
+      grid-template-columns:repeat(4, 1fr);
+      gap:10px;
+      margin-top:18px;
+      width:100%;
+    }
+
+    .pill{
   display:flex;
-  justify-content:center;
-  gap:12px;
-  margin-top:28px;   /* increased spacing */
-  flex-wrap:wrap;
-}
-.pill,
-.pill span{
-  color:rgba(255,245,225,.92) !important;
-}
-.pill{
-  display:flex !important;
   flex-direction:column;
   align-items:center;
   justify-content:center;
-  text-align:center;
-  width:88px;
-  height:56px;
-  padding:6px 6px;
-  border-radius:20px;
-  border:1px solid rgba(255,235,190,.18);
-  background:rgba(255,255,255,.045);
-  backdrop-filter:blur(4px);
-  -webkit-backdrop-filter:blur(4px);
+  gap:6px;
+
+  padding:14px 10px;
+  min-height:90px;
+
+  border-radius:18px;
+  border:1px solid rgba(255,215,150,.26);
+  background:rgba(255,255,255,.08);
+
   cursor:pointer;
   transition:transform .16s ease, background .16s ease, border-color .16s ease;
-}
 
-.pill:hover{
-  transform:translateY(-1px);
-  background:rgba(255,255,255,.07);
-  border-color:rgba(255,235,190,.28);
-  box-shadow:0 8px 20px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.06);
-}
-
-.pill-icon{
-  width:26px;
-  height:26px;
-  object-fit:contain;
-  margin-bottom:6px;
-}
-
-.pill span{
-  display:block;
-  width:100%;
+  font-size:14px;
+  color:rgba(255,255,255,.9);
   text-align:center;
-  font-size:10px;
-  line-height:1.1;
-  white-space:nowrap;
 }
+
+  .pill-icon{
+    width:34px;
+    height:34px;
+    object-fit:contain;
+    display:block;
+    }
+
+    .pill span{
+      display:inline-block;
+      line-height:1;
+    }
 
     .pill:hover, .btn:hover{
       transform:translateY(-1px);
@@ -1030,28 +1020,17 @@
       pointer-events:auto;
     }
 
-   @media (max-width:420px){
-  .pillrow{
-    gap:8px;
-    margin-top:16px;
-  }
+    @media (max-width:420px){
+      .pill{
+        padding:12px 14px;
+        min-height:52px;
+        font-size:13px;
+      }
 
-  .pill{
-    width:78px;
-    height:52px;
-    border-radius:18px;
-  }
-
-  .pill-icon{
-    width:22px;
-    height:22px;
-    margin-bottom:3px;
-  }
-
-  .pill span{
-    font-size:8.5px;
-  }
-}
+      .pill-icon{
+        width:24px;
+        height:24px;
+      }
 
       .countdown{ gap:8px; }
       .cd{ padding:12px 4px 10px; }
@@ -1091,6 +1070,7 @@
     </div>
   </div>
 
+  <!-- Transition video screen -->
   <div id="transitionScreen" aria-hidden="true">
     <video id="transitionVideo" playsinline webkit-playsinline preload="auto">
       <source src="transition.mp4" type="video/mp4" />
@@ -1535,4 +1515,5 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 </body>
-</html>make the icon box smaller to fit well for the body of the content 
+
+</html>
