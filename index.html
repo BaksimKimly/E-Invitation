@@ -9,7 +9,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" href="logo.png" as="image">
-  <link rel="preload" href="hero.mp4" as="video">
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
@@ -1019,6 +1018,7 @@
       user-select:none;
       -webkit-user-drag:none;
       pointer-events:auto;
+      background:#000;
     }
 
     @media (max-width:420px){
@@ -1051,8 +1051,10 @@
 
   <div class="bg-wrap" aria-hidden="true">
     <div class="fallback-bg"></div>
-    <video class="bg-video" id="heroVideo" autoplay muted loop playsinline webkit-playsinline preload="auto">
-      <source src="hero.mp4" type="video/mp4" />
+    <video class="bg-video" id="heroVideo" autoplay muted loop playsinline webkit-playsinline preload="metadata" poster="logo.png">
+  <source src="hero.mp4" type="video/mp4" />
+</video>
+    <source src="hero.mp4" type="video/mp4" />
     </video>
     <div class="overlay"></div>
   </div>
@@ -1071,9 +1073,8 @@
     </div>
   </div>
 
-  <!-- Transition video screen -->
   <div id="transitionScreen" aria-hidden="true">
-    <video id="transitionVideo" playsinline webkit-playsinline preload="auto">
+    <video id="transitionVideo" playsinline webkit-playsinline preload="metadata" muted poster="logo.png">
       <source src="transition.mp4" type="video/mp4" />
     </video>
   </div>
@@ -1167,7 +1168,7 @@
         <div class="content event-content">
           <div class="timeline-wrap">
             <h2 class="section-title event-title">Event Agenda</h2>
-            <img class="timeline-main" src="timeline.png" alt="Wedding Timeline" />
+            <img class="timeline-main" src="timeline.png" alt="Wedding Timeline" loading="lazy" />
           </div>
         </div>
       </section>
@@ -1203,7 +1204,7 @@
           <p class="meta"><strong>The Premier Center Sensok (Building D&amp;E)</strong><br>Phnom Penh, Cambodia</p>
           <div class="qrwrap">
             <div class="qrbox">
-              <img id="qrImg" src="qr.png" alt="QR code" onerror="this.style.display='none'; document.getElementById('qrFallback').style.display='block';" />
+              <img id="qrImg" src="qr.png" alt="QR code" loading="lazy" onerror="this.style.display='none'; document.getElementById('qrFallback').style.display='block';" />
               <div id="qrFallback" style="display:none;color:rgba(255,255,255,.7);padding:14px;text-align:center;font-size:12px;">QR not found.<br>Add <b>qr.png</b></div>
             </div>
             <div class="qrtext"><strong>Please scan QR code for map</strong></div>
@@ -1223,7 +1224,7 @@
     </div>
   </div>
 
-  <audio id="bgMusic" preload="auto" loop>
+  <audio id="bgMusic" preload="metadata" loop playsinline>
     <source src="music.mp3" type="audio/mpeg" />
   </audio>
 
@@ -1259,15 +1260,34 @@ document.addEventListener('DOMContentLoaded', function() {
   let musicStarted = false;
   let scrollY = 0;
   let hasOpenedInvitation = false;
+  let transitionTimeout = null;
 
   const thumbImages = thumbs.map(btn => btn.dataset.full);
 
-  thumbImages.forEach(src => {
-    const img = document.createElement('img');
-    img.src = src;
-    img.loading = "lazy";
-    lbTrack.appendChild(img);
-  });
+  function buildLightbox() {
+    lbTrack.innerHTML = "";
+    thumbImages.forEach(src => {
+      const img = document.createElement("img");
+      img.alt = "Gallery image";
+      img.dataset.src = src;
+      lbTrack.appendChild(img);
+    });
+  }
+
+  function loadLightboxImage(index) {
+    const imgs = lbTrack.querySelectorAll("img");
+    const current = imgs[index];
+    const prev = imgs[index - 1];
+    const next = imgs[index + 1];
+
+    [current, prev, next].forEach(img => {
+      if (img && !img.getAttribute("src")) {
+        img.src = img.dataset.src;
+      }
+    });
+  }
+
+  buildLightbox();
 
   function lockScroll() {
     scrollY = window.pageYOffset || document.documentElement.scrollTop;
@@ -1293,10 +1313,12 @@ document.addEventListener('DOMContentLoaded', function() {
   function updateTrackPosition(smooth = true) {
     lbTrack.style.transition = smooth ? 'transform 0.35s cubic-bezier(0.25, 1, 0.3, 1)' : 'none';
     lbTrack.style.transform = `translateX(-${lbCurrentIndex * 100}%)`;
+    loadLightboxImage(lbCurrentIndex);
   }
 
   function openLb(index) {
     lbCurrentIndex = index;
+    loadLightboxImage(index);
     lb.classList.add("is-open");
     navDock.classList.remove("is-visible");
     lockScroll();
@@ -1385,7 +1407,15 @@ document.addEventListener('DOMContentLoaded', function() {
   function startMusicOnce() {
     if (musicStarted) return;
     musicStarted = true;
-    audio.play().catch(() => {});
+
+    audio.load();
+    const p = audio.play();
+
+    if (p !== undefined) {
+      p.catch(err => {
+        console.log("Audio play failed:", err);
+      });
+    }
   }
 
   function moveBubble(targetLink) {
@@ -1427,13 +1457,23 @@ document.addEventListener('DOMContentLoaded', function() {
     if (hasOpenedInvitation) return;
     hasOpenedInvitation = true;
 
+    if (transitionTimeout) {
+      clearTimeout(transitionTimeout);
+      transitionTimeout = null;
+    }
+
     transitionScreen.classList.remove("is-visible");
     transitionScreen.classList.add("is-leaving");
 
     heroSection.classList.add("hero-reveal");
     navDock.classList.add("is-visible");
     unlockPageScroll();
-    heroVideo?.play().catch(() => {});
+
+  if (heroVideo) {
+  heroVideo.play().catch(err => {
+    console.log("Hero video failed:", err);
+  });
+}
 
     setTimeout(() => {
       transitionScreen.style.display = "none";
@@ -1460,33 +1500,36 @@ document.addEventListener('DOMContentLoaded', function() {
     sections.forEach(sec => scrollObserver.observe(sec));
   }
 
-  openBtn.onclick = () => {
-    startMusicOnce();
-    openingScreen.classList.add("is-leaving");
+  openBtn.onclick = async () => {
+  startMusicOnce();
+  openingScreen.classList.add("is-leaving");
 
-    setTimeout(() => {
-      openingScreen.style.display = "none";
+  setTimeout(async () => {
 
-      transitionScreen.classList.remove("is-leaving");
-      transitionScreen.classList.add("is-visible");
+    openingScreen.style.display = "none";
 
-      transitionVideo.currentTime = 0;
+    transitionScreen.classList.remove("is-leaving");
+    transitionScreen.classList.add("is-visible");
 
-      const playPromise = transitionVideo.play();
+    transitionVideo.currentTime = 0;
+    transitionVideo.load();
 
-      if (playPromise !== undefined) {
-        playPromise.catch(() => {
-          showMainContent();
-        });
-      }
-    }, 700);
-  };
+    try {
+      await transitionVideo.play();
+    } catch (err) {
+      console.log("Transition video failed:", err);
+      showMainContent();
+    }
 
-  transitionVideo.addEventListener("ended", showMainContent);
+  }, 700);
+};
 
-  transitionVideo.addEventListener("error", () => {
-    showMainContent();
-  });
+ transitionVideo.addEventListener("ended", showMainContent);
+
+transitionVideo.addEventListener("error", () => {
+  console.log("Transition video error");
+  showMainContent();
+});
 
   document.addEventListener('click', e => {
     const a = e.target.closest('a[href^="#"]');
@@ -1516,5 +1559,4 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 </body>
-
 </html>
