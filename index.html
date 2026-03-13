@@ -452,7 +452,13 @@
       color:rgba(255,245,210,.92);
       margin:0 0 8px;
     }
-
+    #location .section-title{
+  font-family:"Great Vibes", cursive;
+  font-size:clamp(33px, 7.5vw, 45px);
+  font-weight:500;
+  color:rgba(255,245,210,.92);
+  margin:0 0 8px;
+}
     .countdown{
       display:flex;
       gap:10px;
@@ -1039,7 +1045,7 @@
 
   <nav class="dock" aria-label="Quick navigation" id="navDock">
     <div class="dock-bubble" id="dockBubble"></div>
-    <a href="#top" class="active">Top</a>
+    <a href="#top" class="active">Invitation</a>
     <a href="#event">Event</a>
     <a href="#gallery">Gallery</a>
     <a href="#location">Location</a>
@@ -1165,7 +1171,7 @@
               <img id="qrImg" src="qr.png" alt="QR code" onerror="this.style.display='none'; document.getElementById('qrFallback').style.display='block';" />
               <div id="qrFallback" style="display:none;color:rgba(255,255,255,.7);padding:14px;text-align:center;font-size:12px;">QR not found.<br>Add <b>qr.png</b></div>
             </div>
-            <div class="qrtext"><strong>Please scan QR Code for Map</strong></div>
+            <div class="qrtext"><strong>Please scan QR code for map</strong></div>
           </div>
         </div>
       </section>
@@ -1430,3 +1436,5 @@ document.addEventListener('DOMContentLoaded', function() {
 </body>
 
 </html>
+
+
