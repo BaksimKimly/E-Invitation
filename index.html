@@ -404,55 +404,81 @@
       line-height:1.6;
     }
 
-    .pillrow{
-      display:grid;
-      grid-template-columns:repeat(2, 1fr);
-      gap:10px;
-      margin-top:18px;
-      width:100%;
-    }
+   .countdown{
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  flex-wrap:nowrap;
+  margin-top:22px;
+  margin-bottom:40px;   /* extra space before icons */
+  width:100%;
+}
 
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      justify-content:flex-start;
-      gap:10px;
-      padding:12px 14px;
-      min-height:58px;
-      border-radius:999px;
-      border:1px solid rgba(255,215,150,.26);
-      background:rgba(255,255,255,.08);
-      cursor:pointer;
-      user-select:none;
-      transition:transform .16s ease, background .16s ease, border-color .16s ease;
-      font-size:clamp(12px, 3vw, 15px);
-      color:rgba(255,255,255,.9);
-      font-family:"Cormorant Garamond", serif;
-      white-space:nowrap;
-      text-align:left;
-      width:100%;
-    }
 
-    .pill-icon{
-      width:30px;
-      height:30px;
-      object-fit:contain;
-      display:block;
-      flex-shrink:0;
-      filter: invert(72%) sepia(54%) saturate(452%) hue-rotate(353deg) brightness(92%) contrast(88%);
-    }
 
-    .pill span{
-      display:inline-block;
-      line-height:1;
-    }
+.pillrow{
+  display:flex !important;
+  justify-content:center;
+  gap:10px;
+  margin-top:0;
+  flex-wrap:nowrap !important;
+  width:100%;
+}
 
-    .pill:hover, .btn:hover{
-      transform:translateY(-1px);
-      background:rgba(255,255,255,.13);
-      border-color:rgba(255,215,150,.36);
-    }
+.pill,
+.pill span{
+  color:#fff3d6;
+}
 
+.pill{
+  display:flex !important;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+
+  width:70px !important;
+  min-width:70px !important;
+  max-width:70px !important;
+  height:50px !important;
+  padding:4px 4px !important;
+
+  border-radius:16px;
+  border:1px solid rgba(255,215,150,.26);
+  background:rgba(255,255,255,.08);
+
+  cursor:pointer;
+  user-select:none;
+  overflow:hidden;
+
+  transition:transform .16s ease, background .16s ease, border-color .16s ease;
+}
+
+.pill:hover{
+  transform:translateY(-1px);
+  background:rgba(255,255,255,.13);
+  border-color:rgba(255,215,150,.36);
+}
+
+.pill-icon{
+  width:18px !important;
+  height:18px !important;
+  object-fit:contain;
+  display:block;
+  flex:0 0 auto;
+  margin:0 auto 3px !important;
+}
+
+.pill span{
+  display:block;
+  width:100%;
+  text-align:center;
+  font-size:9px !important;
+  line-height:1.05;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
     .btn{
       display:inline-block;
       margin-top:14px;
@@ -1021,22 +1047,33 @@
       background:#000;
     }
 
-    @media (max-width:420px){
-      .pill{
-        padding:12px 14px;
-        min-height:52px;
-        font-size:13px;
-      }
+  @media (max-width:420px){
+  .pillrow{
+    gap:8px;
+  }
 
-      .pill-icon{
-        width:24px;
-        height:24px;
-      }
+  .pill{
+    width:64px !important;
+    min-width:64px !important;
+    max-width:64px !important;
+    height:46px !important;
+    padding:3px 3px !important;
+  }
 
-      .countdown{ gap:8px; }
-      .cd{ padding:12px 4px 10px; }
-      .cd b{ font-size:clamp(18px, 6vw, 28px); }
-    }
+  .pill-icon{
+    width:16px !important;
+    height:16px !important;
+    margin-bottom:2px !important;
+  }
+
+  .pill span{
+    font-size:8px !important;
+  }
+
+  .countdown{ gap:8px; }
+  .cd{ padding:12px 4px 10px; }
+  .cd b{ font-size:clamp(18px, 6vw, 28px); }
+}
 
     @media (prefers-reduced-motion: reduce){
       *{
@@ -1052,9 +1089,7 @@
   <div class="bg-wrap" aria-hidden="true">
     <div class="fallback-bg"></div>
     <video class="bg-video" id="heroVideo" autoplay muted loop playsinline webkit-playsinline preload="metadata" poster="logo.png">
-  <source src="hero.mp4" type="video/mp4" />
-</video>
-    <source src="hero.mp4" type="video/mp4" />
+      <source src="hero.mp4" type="video/mp4" />
     </video>
     <div class="overlay"></div>
   </div>
@@ -1469,11 +1504,11 @@ document.addEventListener('DOMContentLoaded', function() {
     navDock.classList.add("is-visible");
     unlockPageScroll();
 
-  if (heroVideo) {
-  heroVideo.play().catch(err => {
-    console.log("Hero video failed:", err);
-  });
-}
+    if (heroVideo) {
+      heroVideo.play().catch(err => {
+        console.log("Hero video failed:", err);
+      });
+    }
 
     setTimeout(() => {
       transitionScreen.style.display = "none";
@@ -1501,35 +1536,33 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   openBtn.onclick = async () => {
-  startMusicOnce();
-  openingScreen.classList.add("is-leaving");
+    startMusicOnce();
+    openingScreen.classList.add("is-leaving");
 
-  setTimeout(async () => {
+    setTimeout(async () => {
+      openingScreen.style.display = "none";
 
-    openingScreen.style.display = "none";
+      transitionScreen.classList.remove("is-leaving");
+      transitionScreen.classList.add("is-visible");
 
-    transitionScreen.classList.remove("is-leaving");
-    transitionScreen.classList.add("is-visible");
+      transitionVideo.currentTime = 0;
+      transitionVideo.load();
 
-    transitionVideo.currentTime = 0;
-    transitionVideo.load();
+      try {
+        await transitionVideo.play();
+      } catch (err) {
+        console.log("Transition video failed:", err);
+        showMainContent();
+      }
+    }, 700);
+  };
 
-    try {
-      await transitionVideo.play();
-    } catch (err) {
-      console.log("Transition video failed:", err);
-      showMainContent();
-    }
+  transitionVideo.addEventListener("ended", showMainContent);
 
-  }, 700);
-};
-
- transitionVideo.addEventListener("ended", showMainContent);
-
-transitionVideo.addEventListener("error", () => {
-  console.log("Transition video error");
-  showMainContent();
-});
+  transitionVideo.addEventListener("error", () => {
+    console.log("Transition video error");
+    showMainContent();
+  });
 
   document.addEventListener('click', e => {
     const a = e.target.closest('a[href^="#"]');
