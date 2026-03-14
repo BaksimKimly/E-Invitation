@@ -973,7 +973,7 @@
       opacity:0;
       visibility:hidden;
       pointer-events:none;
-      transition:opacity .35s ease, visibility .35s ease;
+      transition:opacity .2s ease, visibility .2s ease; /* SPED UP TRANSITION */
       cursor:default;
       overflow:hidden;
     }
@@ -1003,7 +1003,7 @@
       box-shadow:0 4px 15px rgba(0,0,0,0.5);
       opacity:0;
       transform:translateY(-15px);
-      transition:all .3s cubic-bezier(0.25, 1, 0.3, 1);
+      transition:all .2s cubic-bezier(0.25, 1, 0.3, 1); /* SPED UP TRANSITION */
       z-index:10001;
     }
 
@@ -1431,7 +1431,7 @@
       function updateTrackPosition(smooth = true) {
         if (!lbTrack) return;
         lbTrack.style.transition = smooth
-          ? "transform 0.35s cubic-bezier(0.25, 1, 0.3, 1)"
+          ? "transform 0.2s cubic-bezier(0.25, 1, 0.3, 1)"
           : "none";
         lbTrack.style.transform = `translateX(-${lbCurrentIndex * 100}%)`;
         loadLightboxImage(lbCurrentIndex);
@@ -1441,18 +1441,26 @@
         if (!lb) return;
         lbCurrentIndex = index;
         loadLightboxImage(index);
-        lb.classList.add("is-open");
+        
         if (navDock) navDock.classList.remove("is-visible");
-        lockScroll();
+        
+        // Prepare track instantly before making lightbox visible to avoid flicker
         updateTrackPosition(false);
-        if (lbTrack) lbTrack.offsetHeight;
+        if (lbTrack) lbTrack.offsetHeight; // Force reflow
+        
+        lockScroll();
+        lb.classList.add("is-open");
       }
 
       function closeLb() {
         if (!lb) return;
         lb.classList.remove("is-open");
-        if (hasOpenedInvitation && navDock) navDock.classList.add("is-visible");
-        unlockScroll();
+        
+        // Wait 200ms for the faster fade-out before showing dock and restoring background jump
+        setTimeout(() => {
+            if (hasOpenedInvitation && navDock) navDock.classList.add("is-visible");
+            unlockScroll();
+        }, 200); 
       }
 
       buildLightbox();
