@@ -222,15 +222,20 @@
       animation:logoFloat 3.8s ease-in-out infinite;
     }
 
-   .open-logo{
+    .open-logo{
       width:100%;
       height:auto;
       object-fit:contain;
       user-select:none;
-      color:transparent; /* Hides the alt-text shadow ghosting */
-      font-size:0; /* Removes the empty bounding box shadow */
+      color:transparent;
+      font-size:0;
+      text-indent:-9999px;
       filter:drop-shadow(0 18px 40px rgba(0,0,0,.55)) drop-shadow(0 0 8px rgba(255,241,176,.10)) drop-shadow(0 0 16px rgba(207,163,79,.08));
       animation:logoGoldGlow 4.5s ease-in-out infinite;
+    }
+
+    .open-logo:-moz-loading {
+      visibility: hidden;
     }
 
     .open-btn--lux{
@@ -463,6 +468,7 @@
       display:block;
       flex:0 0 auto;
       margin:0 auto 3px !important;
+      filter: invert(72%) sepia(54%) saturate(452%) hue-rotate(353deg) brightness(92%) contrast(88%);
     }
 
     .pill span{
@@ -1076,7 +1082,7 @@
 
   <div class="bg-wrap" aria-hidden="true">
     <div class="fallback-bg"></div>
-    <video class="bg-video" id="heroVideo" autoplay muted loop playsinline webkit-playsinline preload="metadata" poster="logo.png">
+    <video class="bg-video" id="heroVideo" autoplay muted loop playsinline webkit-playsinline preload="auto">
       <source src="hero.mp4" type="video/mp4" />
     </video>
     <div class="overlay"></div>
@@ -1088,7 +1094,7 @@
     <div class="open-box">
       <p class="open-sub">Wedding Invitation</p>
       <div class="open-logo-wrap">
-        <img class="open-logo" src="logo.png" alt="Baksim & Kimly Logo" />
+        <img class="open-logo" src="logo.png" alt="Baksim & Kimly Logo" style="opacity:0; transition: opacity 0.4s ease;" onload="this.style.opacity=1" />
       </div>
       <button id="openBtn" type="button" class="open-btn--lux">
         <span class="open-btn__label">Open Invitation</span>
@@ -1097,7 +1103,7 @@
   </div>
 
   <div id="transitionScreen" aria-hidden="true">
-    <video id="transitionVideo" playsinline webkit-playsinline preload="metadata" muted poster="logo.png">
+    <video id="transitionVideo" playsinline webkit-playsinline preload="auto" muted>
       <source src="transition.mp4" type="video/mp4" />
     </video>
   </div>
@@ -1571,14 +1577,13 @@
       }
 
       if (heroVideo) {
-        // Use timeupdate to catch the video right before it hits the end
         heroVideo.addEventListener("timeupdate", function() {
-          // If the video is within 0.25 seconds of finishing, instantly loop it
           if (this.duration && this.currentTime >= this.duration - 0.25) {
-            this.currentTime = 0.1; // Jump to 0.1s to avoid starting black frames
-            this.play().catch(() => {});
+            this.currentTime = 0.15;
           }
         });
+
+        heroVideo.play().catch(() => {});
       }
 
       document.addEventListener("click", e => {
