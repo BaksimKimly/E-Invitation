@@ -29,9 +29,9 @@
 
     *{ box-sizing:border-box; }
 
+    /* FIXED: Removed height modifications so the page doesn't glitch when locking */
     .scroll-lock{
       overflow:hidden !important;
-      height:100svh !important;
       touch-action:none !important;
     }
 
@@ -149,7 +149,7 @@
       opacity:1;
       overflow:hidden;
       background:transparent;
-      min-height:calc(var(--vh) * 100);
+      min-height:100svh;
       padding:20px 10px;
       transition:opacity .85s ease, visibility .85s ease;
       visibility:visible;
@@ -288,12 +288,12 @@
       margin:0 auto;
       width:100%;
       max-width:500px;
-      min-height:calc(var(--vh) * 100);
+      min-height:100svh;
       z-index:9998;
       display:flex;
       align-items:center;
       justify-content:center;
-      background:#000;
+      background:transparent; /* Transparent so it blends perfectly */
       opacity:0;
       visibility:hidden;
       pointer-events:none;
@@ -318,12 +318,12 @@
       height:100%;
       object-fit:cover;
       display:block;
-      background:#000;
+      background:transparent; /* Transparent to prevent black flash */
     }
 
     .hero{
       width:100%;
-      min-height:calc(var(--vh) * 100);
+      min-height:100svh;
       display:flex;
       align-items:center;
       justify-content:center;
@@ -973,7 +973,7 @@
       opacity:0;
       visibility:hidden;
       pointer-events:none;
-      transition:opacity .2s ease, visibility .2s ease; /* SPED UP TRANSITION */
+      transition:opacity .2s ease, visibility .2s ease;
       cursor:default;
       overflow:hidden;
     }
@@ -1003,7 +1003,7 @@
       box-shadow:0 4px 15px rgba(0,0,0,0.5);
       opacity:0;
       transform:translateY(-15px);
-      transition:all .2s cubic-bezier(0.25, 1, 0.3, 1); /* SPED UP TRANSITION */
+      transition:all .2s cubic-bezier(0.25, 1, 0.3, 1);
       z-index:10001;
     }
 
@@ -1038,7 +1038,7 @@
       user-select:none;
       -webkit-user-drag:none;
       pointer-events:auto;
-      background:#000;
+      background:transparent;
     }
 
     @media (max-width:420px){
@@ -1078,7 +1078,7 @@
     }
   </style>
 </head>
-<body class="scroll-lock">
+<body>
 
   <div class="bg-wrap" aria-hidden="true">
     <div class="fallback-bg"></div>
@@ -1288,7 +1288,6 @@
             btnCalendar = document.getElementById("btnCalendar");
 
       let musicStarted = false;
-      let scrollY = 0;
       let hasOpenedInvitation = false;
       let transitionTimeout = null;
 
@@ -1326,28 +1325,13 @@
       }
 
       function lockScroll() {
-        scrollY = window.pageYOffset || document.documentElement.scrollTop;
-        document.body.style.cssText =
-          `position:fixed;top:${-scrollY}px;left:0;right:0;width:100%;height:100vh;overflow:hidden;`;
-        document.documentElement.style.overflow = "hidden";
+        document.documentElement.classList.add("scroll-lock");
+        document.body.classList.add("scroll-lock");
       }
 
       function unlockScroll() {
-        document.documentElement.style.scrollBehavior = "auto";
-        document.body.style.cssText = "";
-        document.documentElement.style.overflow = "";
-        window.scrollTo(0, scrollY);
-
-        setTimeout(() => {
-          document.documentElement.style.scrollBehavior = "";
-        }, 50);
-      }
-
-      function unlockPageScroll() {
         document.documentElement.classList.remove("scroll-lock");
         document.body.classList.remove("scroll-lock");
-        setRealViewportHeight();
-        moveBubble(document.querySelector(".dock a.active") || document.querySelector(".dock a"));
       }
 
       function startMusicOnce() {
@@ -1415,8 +1399,6 @@
         if (heroSection) heroSection.classList.add("hero-reveal");
         if (navDock) navDock.classList.add("is-visible");
 
-        unlockPageScroll();
-
         if (heroVideo) {
           heroVideo.play().catch(() => {});
         }
@@ -1444,10 +1426,11 @@
         
         if (navDock) navDock.classList.remove("is-visible");
         
-        // Prepare track instantly before making lightbox visible to avoid flicker
+        // 1. Move track first so there is NO snap/flicker
         updateTrackPosition(false);
-        if (lbTrack) lbTrack.offsetHeight; // Force reflow
+        if (lbTrack) lbTrack.offsetHeight; 
         
+        // 2. Lock scroll smoothly and open lightbox
         lockScroll();
         lb.classList.add("is-open");
       }
@@ -1456,7 +1439,7 @@
         if (!lb) return;
         lb.classList.remove("is-open");
         
-        // Wait 200ms for the faster fade-out before showing dock and restoring background jump
+        // Wait for the lightbox to fade completely before bringing the scroll back
         setTimeout(() => {
             if (hasOpenedInvitation && navDock) navDock.classList.add("is-visible");
             unlockScroll();
@@ -1550,32 +1533,29 @@
       });
 
       if (openBtn) {
-        openBtn.onclick = async () => {
+        openBtn.onclick = () => {
           startMusicOnce();
 
-          if (openingScreen) openingScreen.classList.add("is-leaving");
-
-          setTimeout(async () => {
-            if (openingScreen) openingScreen.style.display = "none";
-
-            if (transitionScreen) {
-              transitionScreen.classList.remove("is-leaving");
-              transitionScreen.classList.add("is-visible");
+          // Instantly start the video to prevent the black flash block
+          if (transitionVideo) {
+            transitionVideo.currentTime = 0;
+            const playPromise = transitionVideo.play();
+            if (playPromise !== undefined) {
+              playPromise.catch(() => { showMainContent(); });
             }
+          }
 
-            if (transitionVideo) {
-              transitionVideo.currentTime = 0;
-              transitionVideo.load();
+          if (transitionScreen) {
+            transitionScreen.classList.remove("is-leaving");
+            transitionScreen.classList.add("is-visible");
+          }
 
-              try {
-                await transitionVideo.play();
-              } catch (err) {
-                showMainContent();
-              }
-            } else {
-              showMainContent();
-            }
-          }, 700);
+          if (openingScreen) {
+            openingScreen.classList.add("is-leaving");
+            setTimeout(() => {
+              openingScreen.style.display = "none";
+            }, 850); 
+          }
         };
       }
 
