@@ -1571,9 +1571,13 @@
       }
 
       if (heroVideo) {
-        heroVideo.addEventListener("ended", () => {
-          heroVideo.currentTime = 0.1;
-          heroVideo.play().catch(() => {});
+        // Use timeupdate to catch the video right before it hits the end
+        heroVideo.addEventListener("timeupdate", function() {
+          // If the video is within 0.25 seconds of finishing, instantly loop it
+          if (this.duration && this.currentTime >= this.duration - 0.25) {
+            this.currentTime = 0.1; // Jump to 0.1s to avoid starting black frames
+            this.play().catch(() => {});
+          }
         });
       }
 
