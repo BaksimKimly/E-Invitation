@@ -104,7 +104,7 @@
       width:100%;
       max-width:500px;
       min-height:100svh;
-      display:flex;
+      display:none; /* HIDDEN INITIALLY to completely block bleed-through */
       flex-direction:column;
       align-items:center;
       padding:0;
@@ -292,7 +292,7 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      background:#000;
+      background:transparent; 
       opacity:0;
       visibility:hidden;
       pointer-events:none;
@@ -317,7 +317,7 @@
       height:100%;
       object-fit:cover;
       display:block;
-      background:#000;
+      background:transparent; 
     }
 
     .hero{
@@ -420,7 +420,6 @@
       width:100%;
     }
 
-    /* --- FIXED BUTTON LAYOUT --- */
     .pillrow {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -434,7 +433,7 @@
       align-items: center;
       justify-content: center;
       min-height: 54px;
-      padding: 10px 14px 10px 40px; /* Space on left for the absolute icon */
+      padding: 10px 14px 10px 40px; 
       border-radius: 999px;
       border: 1px solid rgba(255,215,150,.26);
       background: rgba(255,255,255,.08);
@@ -453,7 +452,7 @@
 
     .pill-icon {
       position: absolute;
-      left: 18px; /* Locks icons to the far left */
+      left: 18px; 
       width: 22px;
       height: 22px;
       object-fit: contain;
@@ -465,7 +464,6 @@
       background:rgba(255,255,255,.13);
       border-color:rgba(255,215,150,.36);
     }
-    /* --- END FIXED BUTTON LAYOUT --- */
 
     .btn{
       display:inline-block;
@@ -1006,7 +1004,7 @@
 
     @media (max-width:420px){
       .pill{
-        padding: 10px 10px 10px 30px; /* Adjusted padding for smaller phones */
+        padding: 10px 10px 10px 30px; 
       }
       .pill-icon {
         left: 12px;
@@ -1236,6 +1234,7 @@
 
       let musicStarted = false;
       let hasOpenedInvitation = false;
+      let transitionTimeout = null;
 
       const thumbImages = thumbs.map(btn => btn.dataset.full);
 
@@ -1323,6 +1322,16 @@
       function showMainContent() {
         if (hasOpenedInvitation) return;
         hasOpenedInvitation = true;
+
+        const fitViewport = document.getElementById("fitViewport");
+        if (fitViewport) {
+          fitViewport.style.display = "flex";
+        }
+
+        if (transitionTimeout) {
+          clearTimeout(transitionTimeout);
+          transitionTimeout = null;
+        }
 
         if (transitionScreen) {
           transitionScreen.classList.remove("is-visible");
@@ -1469,32 +1478,28 @@
       });
 
       if (openBtn) {
-        openBtn.onclick = async () => {
+        openBtn.onclick = () => {
           startMusicOnce();
 
-          if (openingScreen) openingScreen.classList.add("is-leaving");
-
-          setTimeout(async () => {
-            if (openingScreen) openingScreen.style.display = "none";
-
-            if (transitionScreen) {
-              transitionScreen.classList.remove("is-leaving");
-              transitionScreen.classList.add("is-visible");
+          if (transitionVideo) {
+            transitionVideo.currentTime = 0;
+            const playPromise = transitionVideo.play();
+            if (playPromise !== undefined) {
+              playPromise.catch(() => { showMainContent(); });
             }
+          }
 
-            if (transitionVideo) {
-              transitionVideo.currentTime = 0;
-              // .load() removed to fix black flash without breaking sequence
+          if (transitionScreen) {
+            transitionScreen.classList.remove("is-leaving");
+            transitionScreen.classList.add("is-visible");
+          }
 
-              try {
-                await transitionVideo.play();
-              } catch (err) {
-                showMainContent();
-              }
-            } else {
-              showMainContent();
-            }
-          }, 700);
+          if (openingScreen) {
+            openingScreen.classList.add("is-leaving");
+            setTimeout(() => {
+              openingScreen.style.display = "none";
+            }, 850); 
+          }
         };
       }
 
@@ -1560,12 +1565,23 @@
         };
       }
 
+      function setRealViewportHeight() {
+        document.documentElement.style.setProperty("--vh", `${window.innerHeight * 0.01}px`);
+      }
+
+      setRealViewportHeight();
       tickCountdown();
       moveBubble(document.querySelector(".dock a.active") || document.querySelector(".dock a"));
       setInterval(tickCountdown, 1000);
 
-      window.addEventListener("resize", () => moveBubble(document.querySelector(".dock a.active") || document.querySelector(".dock a")));
-      window.addEventListener("orientationchange", () => moveBubble(document.querySelector(".dock a.active") || document.querySelector(".dock a")));
+      window.addEventListener("resize", () => {
+        setRealViewportHeight();
+        moveBubble(document.querySelector(".dock a.active") || document.querySelector(".dock a"));
+      });
+      window.addEventListener("orientationchange", () => {
+        setRealViewportHeight();
+        moveBubble(document.querySelector(".dock a.active") || document.querySelector(".dock a"));
+      });
     });
   </script>
 
