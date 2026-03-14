@@ -24,6 +24,7 @@
       --gold-2:#f6e27a;
       --gold-3:#cfa34f;
       --gold-4:#fff1b0;
+      --vh:1vh;
     }
 
     *{ box-sizing:border-box; }
@@ -148,7 +149,7 @@
       opacity:1;
       overflow:hidden;
       background:transparent;
-      min-height:100svh;
+      min-height:calc(var(--vh) * 100);
       padding:20px 10px;
       transition:opacity .85s ease, visibility .85s ease;
       visibility:visible;
@@ -226,7 +227,7 @@
       height:auto;
       object-fit:contain;
       user-select:none;
-      color:transparent; 
+      color:transparent;
       font-size:0;
       text-indent:-9999px;
       filter:drop-shadow(0 18px 40px rgba(0,0,0,.55)) drop-shadow(0 0 8px rgba(255,241,176,.10)) drop-shadow(0 0 16px rgba(207,163,79,.08));
@@ -287,7 +288,7 @@
       margin:0 auto;
       width:100%;
       max-width:500px;
-      min-height:100svh;
+      min-height:calc(var(--vh) * 100);
       z-index:9998;
       display:flex;
       align-items:center;
@@ -322,7 +323,7 @@
 
     .hero{
       width:100%;
-      min-height:100svh;
+      min-height:calc(var(--vh) * 100);
       display:flex;
       align-items:center;
       justify-content:center;
@@ -1293,6 +1294,10 @@
 
       const thumbImages = thumbs.map(btn => btn.dataset.full);
 
+      function setRealViewportHeight() {
+        document.documentElement.style.setProperty("--vh", `${window.innerHeight * 0.01}px`);
+      }
+
       function buildLightbox() {
         if (!lbTrack) return;
         lbTrack.innerHTML = "";
@@ -1341,6 +1346,7 @@
       function unlockPageScroll() {
         document.documentElement.classList.remove("scroll-lock");
         document.body.classList.remove("scroll-lock");
+        setRealViewportHeight();
         moveBubble(document.querySelector(".dock a.active") || document.querySelector(".dock a"));
       }
 
@@ -1446,7 +1452,7 @@
         if (!lb) return;
         lb.classList.remove("is-open");
         if (hasOpenedInvitation && navDock) navDock.classList.add("is-visible");
-        setTimeout(unlockScroll, 350); 
+        unlockScroll();
       }
 
       buildLightbox();
@@ -1571,14 +1577,13 @@
       }
 
       if (heroVideo) {
-        // Desktop-friendly seamless loop
-        heroVideo.addEventListener("timeupdate", function() {
-          // If the video is within a fraction of a second from the end, jump back!
-          if (this.duration && this.currentTime >= this.duration - 0.25) {
-            this.currentTime = 0.15; // Skips both end and beginning black frames
+        function checkLoop() {
+          if (heroVideo.duration && heroVideo.currentTime >= heroVideo.duration - 0.25) {
+            heroVideo.currentTime = 0.15; 
           }
-        });
-        
+          requestAnimationFrame(checkLoop);
+        }
+        requestAnimationFrame(checkLoop);
         heroVideo.play().catch(() => {});
       }
 
@@ -1628,12 +1633,13 @@
         };
       }
 
+      setRealViewportHeight();
       tickCountdown();
       moveBubble(document.querySelector(".dock a.active") || document.querySelector(".dock a"));
       setInterval(tickCountdown, 1000);
 
-      window.addEventListener("resize", () => moveBubble(document.querySelector(".dock a.active") || document.querySelector(".dock a")));
-      window.addEventListener("orientationchange", () => moveBubble(document.querySelector(".dock a.active") || document.querySelector(".dock a")));
+      window.addEventListener("resize", setRealViewportHeight);
+      window.addEventListener("orientationchange", setRealViewportHeight);
     });
   </script>
 
