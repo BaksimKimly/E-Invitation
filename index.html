@@ -29,7 +29,6 @@
 
     *{ box-sizing:border-box; }
 
-    /* FIXED: Removed height modifications so the page doesn't glitch when locking */
     .scroll-lock{
       overflow:hidden !important;
       touch-action:none !important;
@@ -149,7 +148,7 @@
       opacity:1;
       overflow:hidden;
       background:transparent;
-      min-height:100svh;
+      min-height:calc(var(--vh) * 100);
       padding:20px 10px;
       transition:opacity .85s ease, visibility .85s ease;
       visibility:visible;
@@ -293,7 +292,7 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      background:transparent; /* Transparent so it blends perfectly */
+      background:#000;
       opacity:0;
       visibility:hidden;
       pointer-events:none;
@@ -318,7 +317,7 @@
       height:100%;
       object-fit:cover;
       display:block;
-      background:transparent; /* Transparent to prevent black flash */
+      background:#000;
     }
 
     .hero{
@@ -421,38 +420,44 @@
       width:100%;
     }
 
-    .pillrow{
-      display:flex !important;
-      justify-content:center;
-      gap:10px;
-      margin-top:0;
-      flex-wrap:nowrap !important;
-      width:100%;
+    /* --- FIXED BUTTON LAYOUT --- */
+    .pillrow {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      width: 100%;
     }
 
-    .pill,
-    .pill span{
-      color:#fff3d6;
+    .pill {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 54px;
+      padding: 10px 14px 10px 40px; /* Space on left for the absolute icon */
+      border-radius: 999px;
+      border: 1px solid rgba(255,215,150,.26);
+      background: rgba(255,255,255,.08);
+      cursor: pointer;
+      user-select: none;
+      transition: transform .16s ease, background .16s ease, border-color .16s ease;
+      text-decoration: none;
     }
 
-    .pill{
-      display:flex !important;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      text-align:center;
-      width:70px !important;
-      min-width:70px !important;
-      max-width:70px !important;
-      height:50px !important;
-      padding:4px 4px !important;
-      border-radius:16px;
-      border:1px solid rgba(255,215,150,.26);
-      background:rgba(255,255,255,.08);
-      cursor:pointer;
-      user-select:none;
-      overflow:hidden;
-      transition:transform .16s ease, background .16s ease, border-color .16s ease;
+    .pill span {
+      color: #fff3d6;
+      font-size: clamp(12px, 3.5vw, 15px);
+      font-family: "Cormorant Garamond", serif;
+      white-space: nowrap;
+    }
+
+    .pill-icon {
+      position: absolute;
+      left: 18px; /* Locks icons to the far left */
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+      filter: invert(72%) sepia(54%) saturate(452%) hue-rotate(353deg) brightness(92%) contrast(88%);
     }
 
     .pill:hover{
@@ -460,27 +465,7 @@
       background:rgba(255,255,255,.13);
       border-color:rgba(255,215,150,.36);
     }
-
-    .pill-icon{
-      width:18px !important;
-      height:18px !important;
-      object-fit:contain;
-      display:block;
-      flex:0 0 auto;
-      margin:0 auto 3px !important;
-      filter: invert(72%) sepia(54%) saturate(452%) hue-rotate(353deg) brightness(92%) contrast(88%);
-    }
-
-    .pill span{
-      display:block;
-      width:100%;
-      text-align:center;
-      font-size:9px !important;
-      line-height:1.05;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
+    /* --- END FIXED BUTTON LAYOUT --- */
 
     .btn{
       display:inline-block;
@@ -584,39 +569,17 @@
 
     .thumb:nth-child(1) img,
     .thumb:nth-child(3) img,
-    .thumb:nth-child(12) img{
-      object-position: center 5%;
-    }
-    .thumb:nth-child(13) img{
-      object-position: center 60%;
-    }
-    .thumb:nth-child(2) img{
-      object-position: 60% 15%;
-    }
-    .thumb:nth-child(4) img{
-      object-position: center 15%;
-    }
-    .thumb:nth-child(5) img{
-      object-position: 10% center;
-    }
-    .thumb:nth-child(6) img{
-      object-position: 90% center;
-    }
-    .thumb:nth-child(7) img{
-      object-position: center 10%;
-    }
-    .thumb:nth-child(8) img{
-      object-position: center 30%;
-    }
-    .thumb:nth-child(11) img{
-      object-position: center 15%;
-    }
-    .thumb:nth-child(14) img{
-      object-position: center 10%;
-    }
-    .thumb:nth-child(15) img{
-      object-position: center 15%;
-    }
+    .thumb:nth-child(12) img{ object-position: center 5%; }
+    .thumb:nth-child(13) img{ object-position: center 60%; }
+    .thumb:nth-child(2) img{ object-position: 60% 15%; }
+    .thumb:nth-child(4) img{ object-position: center 15%; }
+    .thumb:nth-child(5) img{ object-position: 10% center; }
+    .thumb:nth-child(6) img{ object-position: 90% center; }
+    .thumb:nth-child(7) img{ object-position: center 10%; }
+    .thumb:nth-child(8) img{ object-position: center 30%; }
+    .thumb:nth-child(11) img{ object-position: center 15%; }
+    .thumb:nth-child(14) img{ object-position: center 10%; }
+    .thumb:nth-child(15) img{ object-position: center 15%; }
 
     .thumb:hover{
       border-color:rgba(255, 255, 255, 0.4);
@@ -1042,28 +1005,12 @@
     }
 
     @media (max-width:420px){
-      .pillrow{
-        gap:8px;
-      }
-
       .pill{
-        width:64px !important;
-        min-width:64px !important;
-        max-width:64px !important;
-        height:46px !important;
-        padding:3px 3px !important;
+        padding: 10px 10px 10px 30px; /* Adjusted padding for smaller phones */
       }
-
-      .pill-icon{
-        width:16px !important;
-        height:16px !important;
-        margin-bottom:2px !important;
+      .pill-icon {
+        left: 12px;
       }
-
-      .pill span{
-        font-size:8px !important;
-      }
-
       .countdown{ gap:8px; }
       .cd{ padding:12px 4px 10px; }
       .cd b{ font-size:clamp(18px, 6vw, 28px); }
@@ -1289,13 +1236,8 @@
 
       let musicStarted = false;
       let hasOpenedInvitation = false;
-      let transitionTimeout = null;
 
       const thumbImages = thumbs.map(btn => btn.dataset.full);
-
-      function setRealViewportHeight() {
-        document.documentElement.style.setProperty("--vh", `${window.innerHeight * 0.01}px`);
-      }
 
       function buildLightbox() {
         if (!lbTrack) return;
@@ -1382,11 +1324,6 @@
         if (hasOpenedInvitation) return;
         hasOpenedInvitation = true;
 
-        if (transitionTimeout) {
-          clearTimeout(transitionTimeout);
-          transitionTimeout = null;
-        }
-
         if (transitionScreen) {
           transitionScreen.classList.remove("is-visible");
           transitionScreen.classList.add("is-leaving");
@@ -1398,6 +1335,8 @@
 
         if (heroSection) heroSection.classList.add("hero-reveal");
         if (navDock) navDock.classList.add("is-visible");
+
+        unlockScroll();
 
         if (heroVideo) {
           heroVideo.play().catch(() => {});
@@ -1426,11 +1365,9 @@
         
         if (navDock) navDock.classList.remove("is-visible");
         
-        // 1. Move track first so there is NO snap/flicker
         updateTrackPosition(false);
         if (lbTrack) lbTrack.offsetHeight; 
         
-        // 2. Lock scroll smoothly and open lightbox
         lockScroll();
         lb.classList.add("is-open");
       }
@@ -1439,7 +1376,6 @@
         if (!lb) return;
         lb.classList.remove("is-open");
         
-        // Wait for the lightbox to fade completely before bringing the scroll back
         setTimeout(() => {
             if (hasOpenedInvitation && navDock) navDock.classList.add("is-visible");
             unlockScroll();
@@ -1533,29 +1469,32 @@
       });
 
       if (openBtn) {
-        openBtn.onclick = () => {
+        openBtn.onclick = async () => {
           startMusicOnce();
 
-          // Instantly start the video to prevent the black flash block
-          if (transitionVideo) {
-            transitionVideo.currentTime = 0;
-            const playPromise = transitionVideo.play();
-            if (playPromise !== undefined) {
-              playPromise.catch(() => { showMainContent(); });
+          if (openingScreen) openingScreen.classList.add("is-leaving");
+
+          setTimeout(async () => {
+            if (openingScreen) openingScreen.style.display = "none";
+
+            if (transitionScreen) {
+              transitionScreen.classList.remove("is-leaving");
+              transitionScreen.classList.add("is-visible");
             }
-          }
 
-          if (transitionScreen) {
-            transitionScreen.classList.remove("is-leaving");
-            transitionScreen.classList.add("is-visible");
-          }
+            if (transitionVideo) {
+              transitionVideo.currentTime = 0;
+              // .load() removed to fix black flash without breaking sequence
 
-          if (openingScreen) {
-            openingScreen.classList.add("is-leaving");
-            setTimeout(() => {
-              openingScreen.style.display = "none";
-            }, 850); 
-          }
+              try {
+                await transitionVideo.play();
+              } catch (err) {
+                showMainContent();
+              }
+            } else {
+              showMainContent();
+            }
+          }, 700);
         };
       }
 
@@ -1621,13 +1560,12 @@
         };
       }
 
-      setRealViewportHeight();
       tickCountdown();
       moveBubble(document.querySelector(".dock a.active") || document.querySelector(".dock a"));
       setInterval(tickCountdown, 1000);
 
-      window.addEventListener("resize", setRealViewportHeight);
-      window.addEventListener("orientationchange", setRealViewportHeight);
+      window.addEventListener("resize", () => moveBubble(document.querySelector(".dock a.active") || document.querySelector(".dock a")));
+      window.addEventListener("orientationchange", () => moveBubble(document.querySelector(".dock a.active") || document.querySelector(".dock a")));
     });
   </script>
 
